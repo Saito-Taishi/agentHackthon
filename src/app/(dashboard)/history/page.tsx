@@ -1,15 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 type UploadHistory = {
     id: string;
     companyName: string;
     name: string;
+    department: string;
     position: string;
-    email: string;
     phone: string;
-    uploadDate: string;
+    mobile: string;
+    email: string;
+    address: string;
+    cardImage: string;
 };
 
 type DialogState = {
@@ -23,6 +27,11 @@ type EmailForm = {
     body: string;
 };
 
+type ImageModalState = {
+    isOpen: boolean;
+    imageUrl: string | null;
+};
+
 // テーブル値の挿入用のプレースホルダーを定義
 const TABLE_FIELDS = [
     { key: 'companyName', label: '会社名' },
@@ -30,27 +39,35 @@ const TABLE_FIELDS = [
     { key: 'position', label: '役職' },
     { key: 'email', label: 'メールアドレス' },
     { key: 'phone', label: '電話番号' },
+    { key: 'listingStatus', label: '上場区分' },
+    { key: 'companyUrl', label: '会社URL' },
 ] as const;
 
 export default function HistoryPage() {
     const [histories, setHistories] = useState<UploadHistory[]>([
         {
             id: '1',
-            companyName: '株式会社サンプル',
-            name: '山田太郎',
-            position: '営業部長',
-            email: 'yamada@example.com',
+            companyName: '株式会社MIRS',
+            name: '田中 太郎',
+            department: 'メディア事業部',
+            position: '部長',
             phone: '03-1234-5678',
-            uploadDate: '2024-03-20',
+            mobile: '090-1234-5678',
+            email: 'tanaka@mirs.example.com',
+            address: '東京都千代田区丸の内1-1-1',
+            cardImage: '/sample-card-1.jpg',
         },
         {
             id: '2',
-            companyName: '株式会社テスト',
-            name: '鈴木花子',
-            position: 'マネージャー',
-            email: 'suzuki@example.com',
-            phone: '03-8765-4321',
-            uploadDate: '2024-03-19',
+            companyName: '株式会社MIRS',
+            name: '鈴木 花子',
+            department: '営業部',
+            position: '営業部長',
+            phone: '03-1234-5678',
+            mobile: '090-8765-4321',
+            email: 'suzuki@mirs.example.com',
+            address: '東京都千代田区丸の内1-1-1',
+            cardImage: '/sample-card-2.jpg',
         },
     ]);
 
@@ -63,6 +80,10 @@ export default function HistoryPage() {
     const [emailForm, setEmailForm] = useState<EmailForm>({
         subject: '',
         body: '',
+    });
+    const [imageModal, setImageModal] = useState<ImageModalState>({
+        isOpen: false,
+        imageUrl: null,
     });
 
     const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,7 +146,7 @@ export default function HistoryPage() {
                     const placeholder = `{{${field.key}}}`;
                     personalizedBody = personalizedBody.replace(
                         new RegExp(placeholder, 'g'),
-                        history[field.key]
+                        history[field.key] ?? ''
                     );
                 });
 
@@ -173,86 +194,153 @@ export default function HistoryPage() {
         setDialog(prev => ({ ...prev, isOpen: false }));
     };
 
+    // 画像モーダルを開く関数
+    const openImageModal = (imageUrl: string) => {
+        setImageModal({
+            isOpen: true,
+            imageUrl,
+        });
+    };
+
+    // 画像モーダルを閉じる関数
+    const closeImageModal = () => {
+        setImageModal({
+            isOpen: false,
+            imageUrl: null,
+        });
+    };
+
     return (
-        <div className="container mx-auto">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">アップロード履歴</h1>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+                    アップロード履歴
+                </h1>
                 <button
                     onClick={handleConfirmSend}
                     disabled={selectedIds.length === 0 || isSending}
                     className={`
-                        px-4 py-2 rounded-lg font-medium text-white
+                        relative inline-flex items-center justify-center px-5 py-2.5
+                        rounded-md font-medium focus:outline-none focus:ring-2
+                        focus:ring-offset-2 transition-colors
                         ${selectedIds.length === 0 || isSending
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-blue-600 hover:bg-blue-700'
+                            ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed text-gray-700 dark:text-gray-200'
+                            : 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
                         }
-                        transition-colors
                     `}
                 >
                     {isSending ? '送信中...' : `選択したメンバーにメール送信 (${selectedIds.length})`}
                 </button>
             </div>
 
-            <div className="overflow-x-auto">
-                <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
-                    <thead className="bg-gray-50 dark:bg-gray-700">
+            <div className="overflow-x-auto bg-white dark:bg-gray-800 shadow-md rounded-lg">
+                <table className="min-w-full table-auto divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead className="bg-gray-100 dark:bg-gray-700">
                         <tr>
-                            <th className="px-6 py-3 text-left">
+                            <th scope="col" className="px-6 py-3 text-left">
                                 <input
                                     type="checkbox"
                                     onChange={handleSelectAll}
-                                    checked={selectedIds.length === histories.length}
-                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    checked={selectedIds.length === histories.length && histories.length > 0}
+                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600"
                                 />
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200"
+                            >
+                                名刺画像
+                            </th>
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200"
+                            >
                                 会社名
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200"
+                            >
                                 氏名
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                役職
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200"
+                            >
+                                部署・役職
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                メールアドレス
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                電話番号
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                アップロード日
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200"
+                            >
+                                連絡先
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                         {histories.map((history) => (
-                            <tr key={history.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <td className="px-6 py-4">
+                            <tr
+                                key={history.id}
+                                className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+                            >
+                                <td className="px-6 py-5">
                                     <input
                                         type="checkbox"
                                         checked={selectedIds.includes(history.id)}
                                         onChange={() => handleSelect(history.id)}
-                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600"
                                     />
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                    {history.companyName}
+                                <td className="px-6 py-5">
+                                    <button
+                                        type="button"
+                                        onClick={() => openImageModal(history.cardImage)}
+                                        className="relative w-20 h-20 overflow-hidden rounded-lg flex-shrink-0 border border-gray-200 dark:border-gray-700 shadow-sm group"
+                                    >
+                                        <Image
+                                            src={history.cardImage}
+                                            alt={`${history.name}の名刺`}
+                                            fill
+                                            className="object-cover transition-transform group-hover:scale-105"
+                                        />
+                                    </button>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                    {history.name}
+                                <td className="px-6 py-5">
+                                    <div className="text-base font-semibold text-blue-700 dark:text-blue-400">
+                                        {history.companyName}
+                                    </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                    {history.position}
+                                <td className="px-6 py-5">
+                                    <div className="text-base font-medium text-gray-800 dark:text-gray-100">
+                                        {history.name}
+                                    </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                    {history.email}
+                                <td className="px-6 py-5">
+                                    <div className="mb-1 font-medium text-gray-900 dark:text-gray-100">
+                                        {history.department}
+                                    </div>
+                                    <div className="text-gray-600 dark:text-gray-300">
+                                        {history.position}
+                                    </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                    {history.phone}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                    {history.uploadDate}
+                                <td className="px-6 py-5">
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2 text-gray-800 dark:text-gray-100">
+                                            <span className="w-5">📞</span> {history.phone}
+                                        </div>
+                                        <div className="flex items-center gap-2 text-gray-800 dark:text-gray-100">
+                                            <span className="w-5">📱</span> {history.mobile}
+                                        </div>
+                                        <div className="flex items-center gap-2 text-gray-800 dark:text-gray-100">
+                                            <span className="w-5">✉️</span>
+                                            <a
+                                                href={`mailto:${history.email}`}
+                                                className="text-blue-600 dark:text-blue-400 hover:underline"
+                                            >
+                                                {history.email}
+                                            </a>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
@@ -262,16 +350,21 @@ export default function HistoryPage() {
 
             {/* ダイアログ */}
             {dialog.isOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full">
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50
+                               transition-opacity"
+                >
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full shadow-lg relative">
                         {dialog.type === 'confirm' && (
                             <>
-                                <h3 className="text-lg font-semibold mb-4">メール送信</h3>
+                                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
+                                    メール送信
+                                </h3>
                                 <div className="space-y-4 mb-6">
                                     <div>
                                         <label
                                             htmlFor="subject"
-                                            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                            className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300"
                                         >
                                             件名
                                         </label>
@@ -279,14 +372,18 @@ export default function HistoryPage() {
                                             id="subject"
                                             type="text"
                                             value={emailForm.subject}
-                                            onChange={(e) => setEmailForm(prev => ({ ...prev, subject: e.target.value }))}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            onChange={(e) =>
+                                                setEmailForm(prev => ({ ...prev, subject: e.target.value }))
+                                            }
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md
+                                                       shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                                       dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                         />
                                     </div>
                                     <div>
                                         <label
                                             htmlFor="body"
-                                            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                            className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300"
                                         >
                                             本文
                                         </label>
@@ -297,7 +394,10 @@ export default function HistoryPage() {
                                                     key={field.key}
                                                     onClick={() => insertFieldToBody(field.key)}
                                                     type="button"
-                                                    className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+                                                    className="inline-flex items-center px-2.5 py-1.5 border border-gray-300
+                                                               text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50
+                                                               dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600
+                                                               focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 >
                                                     {field.label}を挿入
                                                 </button>
@@ -307,8 +407,12 @@ export default function HistoryPage() {
                                             id="body"
                                             rows={6}
                                             value={emailForm.body}
-                                            onChange={(e) => setEmailForm(prev => ({ ...prev, body: e.target.value }))}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            onChange={(e) =>
+                                                setEmailForm(prev => ({ ...prev, body: e.target.value }))
+                                            }
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
+                                                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                                       dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                         />
                                         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                             ※ 挿入されたフィールドは送信時に各ユーザーの情報に置換されます
@@ -318,7 +422,7 @@ export default function HistoryPage() {
                                 <div className="flex justify-end gap-3">
                                     <button
                                         onClick={closeDialog}
-                                        className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                        className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                                     >
                                         キャンセル
                                     </button>
@@ -326,7 +430,8 @@ export default function HistoryPage() {
                                         onClick={handleSendEmail}
                                         disabled={!emailForm.subject || !emailForm.body}
                                         className={`
-                                            px-4 py-2 rounded-lg text-white
+                                            px-4 py-2 rounded-md font-medium text-white
+                                            transition-colors focus:outline-none
                                             ${!emailForm.subject || !emailForm.body
                                                 ? 'bg-gray-400 cursor-not-allowed'
                                                 : 'bg-blue-600 hover:bg-blue-700'
@@ -341,28 +446,98 @@ export default function HistoryPage() {
 
                         {(dialog.type === 'success' || dialog.type === 'error') && (
                             <>
-                                <div className={`mb-4 text-${dialog.type === 'success' ? 'green' : 'red'}-600`}>
+                                <div
+                                    className={`mb-4 flex justify-center text-${dialog.type === 'success' ? 'green' : 'red'
+                                        }-600`}
+                                >
                                     {dialog.type === 'success' ? (
-                                        <svg className="w-6 h-6 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        <svg
+                                            className="w-10 h-10"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M5 13l4 4L19 7"
+                                            />
                                         </svg>
                                     ) : (
-                                        <svg className="w-6 h-6 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        <svg
+                                            className="w-10 h-10"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M6 18L18 6M6 6l12 12"
+                                            />
                                         </svg>
                                     )}
                                 </div>
-                                <p className="text-center mb-6">{dialog.message}</p>
+                                <p className="text-center mb-6 text-gray-900 dark:text-gray-100">
+                                    {dialog.message}
+                                </p>
                                 <div className="flex justify-center">
                                     <button
                                         onClick={closeDialog}
-                                        className="px-4 py-2 rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                                        className="px-4 py-2 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300
+                                                   dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                     >
                                         閉じる
                                     </button>
                                 </div>
                             </>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* 画像モーダル */}
+            {imageModal.isOpen && imageModal.imageUrl && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 cursor-pointer
+                               transition-opacity"
+                    onClick={closeImageModal}
+                >
+                    <div
+                        className="relative max-w-4xl w-full max-h-[90vh] bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg
+                                   transition-transform transform hover:scale-105 sm:hover:scale-100"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <button
+                            onClick={closeImageModal}
+                            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors"
+                        >
+                            <svg
+                                className="w-6 h-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-label="閉じる"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
+                        <div className="relative w-full h-[80vh]">
+                            <Image
+                                src={imageModal.imageUrl}
+                                alt="名刺拡大画像"
+                                fill
+                                className="object-contain"
+                                quality={100}
+                            />
+                        </div>
                     </div>
                 </div>
             )}
