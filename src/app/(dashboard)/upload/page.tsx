@@ -3,12 +3,6 @@
 import { useImageUpload } from '@/utils/hooks/useUploadHooks';
 import Image from 'next/image';
 import { v4 as uuidv4 } from "uuid";
-import {
-    FileUploadDropzone,
-    FileUploadList,
-    FileUploadRoot,
-  } from "@/components/ui/file-upload"
-
 
 
 // コンポーネント部分
@@ -25,7 +19,7 @@ export default function UploadPage() {
             <h1 className="text-2xl font-bold mb-8">画像アップロード</h1>
 
             {/* 画像選択エリア */}
-            {/* <div className="mb-8">
+            <div className="mb-8">
                 <label
                     htmlFor="image-upload"
                     className="block w-full h-48 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
@@ -58,51 +52,41 @@ export default function UploadPage() {
                         onChange={handleImageSelect}
                     />
                 </label>
-            </div> */}
+            </div>
 
 
-            <FileUploadRoot maxW="xl" alignItems="stretch" maxFiles={10}>
-              <FileUploadDropzone
-                label="Drag and drop here to upload"
-                description=".png, .jpg up to 5MB"
-              />
-              <FileUploadList />
-            </FileUploadRoot>
             {/* 画像プレビューエリア */}
             {selectedImages.length > 0 && (
-                <div className="mb-8 grid grid-cols-3 gap-4">
-                    {/* 画像プレビューエリア */}
-                    {selectedImages.length > 0 && (
-                        <div className="mb-8 grid grid-cols-3 gap-4">
-                            {selectedImages.map((image) => {
-                                // map の中でオブジェクトに id を追加
-                                const imageWithId = { url: image, id: uuidv4() };
-                                return (
-                                    <div key={imageWithId.id} className="relative">
-                                        <Image
-                                            src={imageWithId.url}
-                                            alt={""}
-                                            width={200}
-                                            height={200}
-                                            style={{ objectFit: "cover" }}
-                                        />
-                                        <button
-                                            onClick={() =>
-                                                handleRemoveImage(
-                                                    selectedImages.indexOf(imageWithId.url)
-                                                )
-                                            }
-                                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-700"
-                                            type="button"
-                                        >
-                                            {/* ... */}
-                                        </button>
-                                    </div>
-                                );
-                            })}
+                <div className="mb-8 flex flex-col gap-4">
+                {/* 画像プレビューエリア */}
+                {selectedImages.map((image) => {
+                    const imageWithId = { url: image, id: uuidv4() };
+                    return (
+                        <div key={imageWithId.id} className="relative">
+                            <div className="flex items-center gap-2">
+                                <Image
+                                    src={imageWithId.url}
+                                    alt={""}
+                                    width={200}
+                                    height={200}
+                                    style={{ objectFit: "cover" }}
+                                />
+                                <button
+                                    onClick={() =>
+                                        handleRemoveImage(
+                                            selectedImages.indexOf(imageWithId.url)
+                                        )
+                                    }
+                                    className="bg-red-500 text-white rounded px-3 py-1 hover:bg-red-700"
+                                    type="button"
+                                >
+                                    削除する
+                                </button>
+                            </div>
                         </div>
-                    )}
-                </div>
+                    );
+                })}
+            </div>
             )}
 
             {/* 実行ボタン */}
