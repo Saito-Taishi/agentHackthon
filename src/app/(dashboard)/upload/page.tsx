@@ -57,36 +57,47 @@ export default function UploadPage() {
 
             {/* 画像プレビューエリア */}
             {selectedImages.length > 0 && (
-                <div className="mb-8 flex flex-col gap-4">
-                {/* 画像プレビューエリア */}
-                {selectedImages.map((image) => {
-                    const imageWithId = { url: image, id: uuidv4() };
-                    return (
-                        <div key={imageWithId.id} className="relative">
-                            <div className="flex items-center gap-2">
-                                <Image
-                                    src={imageWithId.url}
-                                    alt={""}
-                                    width={200}
-                                    height={200}
-                                    style={{ objectFit: "cover" }}
-                                />
-                                <button
-                                    onClick={() =>
-                                        handleRemoveImage(
-                                            selectedImages.indexOf(imageWithId.url)
-                                        )
-                                    }
-                                    className="bg-red-500 text-white rounded px-3 py-1 hover:bg-red-700"
-                                    type="button"
-                                >
-                                    削除する
-                                </button>
+                <div className="mb-8 grid grid-cols-3 gap-4">
+                    {selectedImages.map((image) => {
+                        const imageWithId = { url: image, id: uuidv4() };
+                        return (
+                            <div
+                                key={imageWithId.id}
+                                className="relative p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-gray-800"
+                            >
+                                <div className="space-y-3">
+                                    <div className="relative w-full h-[160px]">
+                                        <Image
+                                            src={imageWithId.url}
+                                            alt=""
+                                            fill
+                                            className="rounded-md object-cover"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={() => handleRemoveImage(selectedImages.indexOf(imageWithId.url))}
+                                        className="w-full bg-red-500 text-white rounded-lg px-3 py-1.5 hover:bg-red-600 transition-colors flex items-center justify-center gap-1.5 text-sm"
+                                        type="button"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-4 w-4"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                                clipRule="evenodd"
+                                            />
+                                        </svg>
+                                        削除する
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    );
-                })}
-            </div>
+                        );
+                    })}
+                </div>
             )}
 
             {/* 実行ボタン */}
