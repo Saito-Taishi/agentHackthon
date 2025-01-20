@@ -1,33 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useImageUpload } from '@/utils/hooks/useUploadHooks';
 import Image from 'next/image';
 
+
+// コンポーネント部分
 export default function UploadPage() {
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-
-    const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            const imageUrl = URL.createObjectURL(file);
-            setSelectedImage(imageUrl);
-        }
-    };
-
-    const handleSubmit = async () => {
-        if (!selectedImage) return;
-
-        setIsLoading(true);
-        try {
-            // TODO: ここに画像処理のロジックを実装
-            await new Promise(resolve => setTimeout(resolve, 2000)); // 仮の処理時間
-        } catch (error) {
-            console.error('Error processing image:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const { selectedImage, isLoading, handleImageSelect, handleSubmit } = useImageUpload();
 
     return (
         <div className="container mx-auto max-w-3xl">
@@ -45,8 +24,9 @@ export default function UploadPage() {
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
-                            aria-label="アップロードアイコン"
+                            aria-labelledby="upload-icon-label"
                         >
+                            <title>アップロードアイコン</title>
                             <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -85,16 +65,17 @@ export default function UploadPage() {
             {/* 実行ボタン */}
             <div className="flex justify-center">
                 <button
+                    type='button'
                     onClick={handleSubmit}
                     disabled={!selectedImage || isLoading}
                     className={`
-            px-6 py-3 rounded-lg font-medium text-white
-            ${!selectedImage || isLoading
+              px-6 py-3 rounded-lg font-medium text-white
+              ${!selectedImage || isLoading
                             ? 'bg-gray-400 cursor-not-allowed'
                             : 'bg-blue-600 hover:bg-blue-700'
                         }
-            transition-colors
-          `}
+              transition-colors
+            `}
                 >
                     {isLoading ? (
                         <span className="flex items-center">
@@ -104,6 +85,7 @@ export default function UploadPage() {
                                 fill="none"
                                 viewBox="0 0 24 24"
                             >
+                                <title>ローディング</title>
                                 <circle
                                     className="opacity-25"
                                     cx="12"
