@@ -2,12 +2,17 @@
 
 import { useImageUpload } from '@/utils/hooks/useUploadHooks';
 import Image from 'next/image';
-
+import { v4 as uuidv4 } from "uuid";
 
 // コンポーネント部分
 export default function UploadPage() {
-    const { selectedImage, isLoading, handleImageSelect, handleSubmit } = useImageUpload();
-
+    const {
+        selectedImages,
+        isLoading,
+        handleImageSelect,
+        handleRemoveImage,
+        handleSubmit,
+    } = useImageUpload();
     return (
         <div className="container mx-auto max-w-3xl">
             <h1 className="text-2xl font-bold mb-8">画像アップロード</h1>
@@ -49,16 +54,39 @@ export default function UploadPage() {
             </div>
 
             {/* 画像プレビューエリア */}
-            {selectedImage && (
-                <div className="mb-8">
-                    <div className="relative w-full h-64 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
-                        <Image
-                            src={selectedImage}
-                            alt="Selected image preview"
-                            fill
-                            style={{ objectFit: 'contain' }}
-                        />
-                    </div>
+            {selectedImages.length > 0 && (
+                <div className="mb-8 grid grid-cols-3 gap-4">
+                    {/* 画像プレビューエリア */}
+                    {selectedImages.length > 0 && (
+                        <div className="mb-8 grid grid-cols-3 gap-4">
+                            {selectedImages.map((image) => {
+                                // map の中でオブジェクトに id を追加
+                                const imageWithId = { url: image, id: uuidv4() };
+                                return (
+                                    <div key={imageWithId.id} className="relative">
+                                        <Image
+                                            src={imageWithId.url}
+                                            alt={""}
+                                            width={200}
+                                            height={200}
+                                            style={{ objectFit: "cover" }}
+                                        />
+                                        <button
+                                            onClick={() =>
+                                                handleRemoveImage(
+                                                    selectedImages.indexOf(imageWithId.url)
+                                                )
+                                            }
+                                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-700"
+                                            type="button"
+                                        >
+                                            {/* ... */}
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -67,15 +95,15 @@ export default function UploadPage() {
                 <button
                     type='button'
                     onClick={handleSubmit}
-                    disabled={!selectedImage || isLoading}
+                    disabled={!selectedImages || isLoading}
                     className={`
-              px-6 py-3 rounded-lg font-medium text-white
-              ${!selectedImage || isLoading
+                        px-6 py-3 rounded-lg font-medium text-white
+                            ${!selectedImages || isLoading
                             ? 'bg-gray-400 cursor-not-allowed'
                             : 'bg-blue-600 hover:bg-blue-700'
                         }
-              transition-colors
-            `}
+                        transition-colors
+                    `}
                 >
                     {isLoading ? (
                         <span className="flex items-center">
