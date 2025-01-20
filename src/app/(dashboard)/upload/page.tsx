@@ -3,6 +3,13 @@
 import { useImageUpload } from '@/utils/hooks/useUploadHooks';
 import Image from 'next/image';
 import { v4 as uuidv4 } from "uuid";
+import {
+    FileUploadDropzone,
+    FileUploadList,
+    FileUploadRoot,
+  } from "@/components/ui/file-upload"
+
+
 
 // コンポーネント部分
 export default function UploadPage() {
@@ -18,7 +25,7 @@ export default function UploadPage() {
             <h1 className="text-2xl font-bold mb-8">画像アップロード</h1>
 
             {/* 画像選択エリア */}
-            <div className="mb-8">
+            {/* <div className="mb-8">
                 <label
                     htmlFor="image-upload"
                     className="block w-full h-48 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
@@ -51,8 +58,16 @@ export default function UploadPage() {
                         onChange={handleImageSelect}
                     />
                 </label>
-            </div>
+            </div> */}
 
+
+            <FileUploadRoot maxW="xl" alignItems="stretch" maxFiles={10}>
+              <FileUploadDropzone
+                label="Drag and drop here to upload"
+                description=".png, .jpg up to 5MB"
+              />
+              <FileUploadList />
+            </FileUploadRoot>
             {/* 画像プレビューエリア */}
             {selectedImages.length > 0 && (
                 <div className="mb-8 grid grid-cols-3 gap-4">
