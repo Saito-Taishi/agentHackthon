@@ -2,22 +2,33 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
-  // セッションCookieの存在をチェック
   const session = req.cookies.get('session');
+  const path = req.nextUrl.pathname;
 
-  if (!session && req.nextUrl.pathname !== '/login') {
-    // 未ログインで/login以外にアクセスした場合、/loginにリダイレクト
-    return NextResponse.redirect(new URL('/login', req.url));
+  // 保護するパスのリスト
+  const protectedPaths = ['/history', '/upload'];
+
+  // 保護されたパスへのアクセスをチェック
+  if (protectedPaths.some(protectedPath => path.startsWith(protectedPath))) {
+    if (!session) {
+      return NextResponse.redirect(new URL('/login', req.url));
+    }
   }
 
-  if (session && req.nextUrl.pathname === '/login') {
-    // ログイン済みで/loginにアクセスした場合、/にリダイレクト
-    return NextResponse.redirect(new URL('/', req.url));
+  // ログインページへのアクセス制御
+  if (path === '/login') {
+    if (session) {
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/((?!api|static|.*\\..*|_next).*)'], // api, static, _nextフォルダを除外
+  matcher: [
+    '/history',
+    '/upload',
+    '/login',
+  ],
 };
