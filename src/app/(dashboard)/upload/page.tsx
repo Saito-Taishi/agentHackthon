@@ -1,6 +1,6 @@
 'use client';
 
-import { useImageUpload } from '@/utils/hooks/useUploadHooks';
+import { useImageUpload } from './useUploadHooks';
 import Image from 'next/image';
 import { v4 as uuidv4 } from "uuid";
 
