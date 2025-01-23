@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   try {
     const { idToken } = await request.json();
 
-    const expiresIn = 60 * 60 * 24 * 30 * 1000; // 30日
+    const expiresIn = 60 * 60 * 24 * 14 * 1000; // 14日
     const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
 
     // Cookieを設定
