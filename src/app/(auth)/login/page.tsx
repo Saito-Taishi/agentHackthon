@@ -2,26 +2,42 @@
 
 import { useState } from 'react';
 import { auth } from '@/utils/config/firebase';
+import { useRouter } from 'next/navigation';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { FcGoogle } from 'react-icons/fc';
 
-export default function GoogleLoginPage() {
+export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
       const provider = new GoogleAuthProvider();
-      // ポップアップでGoogleログイン
       const result = await signInWithPopup(auth, provider);
-      console.log('ログイン成功:', result.user);
-      // ログイン後の処理（例: router.push('/dashboard') など）
-    } catch (error) {
-      console.error('ログインエラー:', error);
+
+      // ログイン成功時にセッションCookieを設定
+      const idToken = await result.user.getIdToken();
+
+      // サーバーにIDトークンを送信してセッションCookieを設定
+      const response = await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idToken }),
+      });
+
+      if (response.ok) {
+        router.push('/upload');
+      }
+    } catch (err) {
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <>
@@ -46,8 +62,8 @@ export default function GoogleLoginPage() {
               fill="none"
               viewBox="0 0 24 24"
             >
-            <title>タイトル</title>
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+              <title>タイトル</title>
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
             </svg>
           ) : (
