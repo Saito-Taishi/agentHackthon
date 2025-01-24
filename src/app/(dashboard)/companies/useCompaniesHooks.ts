@@ -1,12 +1,12 @@
-"use client"
+"use client";
 import { useState } from "react";
 
 interface Company {
-    id:string
+    id: string;
     companyName: string;
     url: string;
     IPO: "上場" | "未上場";
-    employeeCount:string;
+    employeeCount: string;
     sales: string;
     businessActivities: string[];
     headOfficeAddress: string;
@@ -14,11 +14,19 @@ interface Company {
     established: string;
 }
 
+interface Employee {
+    id: string;
+    name: string;
+    affiliation: string; // 所属キー
+    position: string;
+    email: string;
+    companyID: string; // 所属会社ID
+}
 
-export function useCompaniesHooks(){
+export function useCompaniesHooks() {
     const companies: Company[] = [
         {
-            id:"1",
+            id: "1",
             companyName: "サンプル株式会社",
             url: "https://example.com",
             IPO: "未上場",
@@ -30,7 +38,7 @@ export function useCompaniesHooks(){
             established: "2015年4月1日",
         },
         {
-            id:"2",
+            id: "2",
             companyName: "テスト合同会社",
             url: "https://test.co.jp",
             IPO: "上場",
@@ -42,7 +50,7 @@ export function useCompaniesHooks(){
             established: "2010年7月1日",
         },
         {
-            id:"3",
+            id: "3",
             companyName: "DEMO株式会社",
             url: "https://demo.jp",
             IPO: "未上場",
@@ -54,7 +62,7 @@ export function useCompaniesHooks(){
             established: "2018年1月15日",
         },
         {
-            id:"4",
+            id: "4",
             companyName: "ABCホールディングス",
             url: "https://abc-holdings.co.jp",
             IPO: "上場",
@@ -67,20 +75,98 @@ export function useCompaniesHooks(){
         },
     ];
 
+    const employees: Employee[] = [
+        // サンプル株式会社の従業員
+        {
+            id: "e1",
+            companyID: "1",
+            name: "山田 太郎",
+            affiliation: "空間マーケティング部 キュレーション課",
+            position: "エンジニア",
+            email: "taro.yamada@example.com",
+        },
+        {
+            id: "e2",
+            companyID: "1",
+            name: "佐藤 花子",
+            affiliation: "総合支援部",
+            position: "プロジェクトマネージャー",
+            email: "hanako.sato@example.com",
+        },
+        // テスト合同会社の従業員
+        {
+            id: "e3",
+            companyID: "2",
+            name: "鈴木 一郎",
+            affiliation: "パッケージイノベーション部",
+            position: "物流マネージャー",
+            email: "ichiro.suzuki@test.co.jp",
+        },
+        {
+            id: "e4",
+            companyID: "2",
+            name: "高橋 次郎",
+            affiliation: "パッケージイノベーション部",
+            position: "ECサイト担当",
+            email: "jiro.takahashi@test.co.jp",
+        },
+        // DEMO株式会社の従業員
+        {
+            id: "e5",
+            companyID: "3",
+            name: "田中 三郎",
+            affiliation: "パッケージイノベーション部",
+            position: "マーケティング担当",
+            email: "saburo.tanaka@demo.jp",
+        },
+        {
+            id: "e6",
+            companyID: "3",
+            name: "伊藤 四郎",
+            affiliation: "パッケージイノベーション部",
+            position: "コンサルタント",
+            email: "shiro.ito@demo.jp",
+        },
+        // ABCホールディングスの従業員
+        {
+            id: "e7",
+            companyID: "4",
+            name: "渡辺 五郎",
+            affiliation: "パッケージイノベーション部",
+            position: "製造部長",
+            email: "goro.watanabe@abc-holdings.co.jp",
+        },
+        {
+            id: "e8",
+            companyID: "4",
+            name: "中村 六郎",
+            affiliation: "パッケージイノベーション部",
+            position: "ITソリューションエンジニア",
+            email: "rokuro.nakamura@abc-holdings.co.jp",
+        },
+    ];
 
-    const[open, setOpen] = useState<boolean>(false)
-    const [selectedCompanyName, setSelectedCompanyName] = useState(""); 
-    const handleCompanyNameClick = (companyName: string) => {
-      setSelectedCompanyName(companyName); // 会社名をstateにセット
-      setOpen(true); // ドロワーを開く
+    const [open, setOpen] = useState<boolean>(false);
+    const [selectedCompanyName, setSelectedCompanyName] = useState("");
+    const [selectedCompanyId, setSelectedCompanyId] = useState("");
+
+    const handleCompanyNameClick = (companyName: string, companyId: string) => {
+        setSelectedCompanyName(companyName);
+        setSelectedCompanyId(companyId);
+        setOpen(true);
     };
-  
 
-    return{
+    const getEmployeesByCompanyId = (companyId: string) => {
+        return employees.filter(employee => employee.companyID === companyId);
+    };
+
+    return {
         companies,
         open,
         setOpen,
         selectedCompanyName,
-        handleCompanyNameClick
-    }
+        selectedCompanyId,
+        handleCompanyNameClick,
+        getEmployeesByCompanyId
+    };
 }
