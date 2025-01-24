@@ -11,7 +11,7 @@ export function Topbar() {
                     アップロード
                 </Link>
                 <Link
-                    href="/history"
+                    href="/companies"
                     className="px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800"
                 >
                     履歴
