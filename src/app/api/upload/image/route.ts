@@ -42,12 +42,12 @@ export async function POST(request: Request) {
       result: response,
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error processing image:', error);
     return NextResponse.json({
       success: false,
       message: 'Error processing the image',
-      error: error.message || String(error),
+      error: String(error),
     });
   }
 }

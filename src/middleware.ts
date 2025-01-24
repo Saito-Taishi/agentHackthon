@@ -18,7 +18,7 @@ export async function middleware(req: NextRequest) {
   // ログインページへのアクセス制御
   if (path === '/login') {
     if (session) {
-      return NextResponse.redirect(new URL('/dashboard', req.url));
+      return NextResponse.redirect(new URL('/upload', req.url));
     }
   }
 
