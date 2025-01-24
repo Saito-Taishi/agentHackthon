@@ -14,7 +14,7 @@ export function Topbar() {
                     href="/companies"
                     className="px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800"
                 >
-                    履歴
+                    企業一覧
                 </Link>
             </nav>
         </header>
