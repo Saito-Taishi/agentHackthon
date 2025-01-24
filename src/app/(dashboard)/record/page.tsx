@@ -1,91 +1,20 @@
 "use client";
-import { useState } from "react";
+
 import Image from 'next/image';
-
-interface BusinessCard {
-    id: string;
-    uploadedAt: string;
-    companyName: string;
-    employeeName: string;
-    position: string;
-    email: string;
-    imageUrl: string;
-    status: boolean;
-}
-
-interface EmailDialog {
-    subject: string;
-    body: string;
-}
+import { useRecordHooks } from './useRecordHooks';
 
 export default function RecordPage() {
-    // 後でAPIから取得する形に変更
-    const [records] = useState<BusinessCard[]>([
-        {
-            id: "1",
-            uploadedAt: "2024-03-15 14:30:25",
-            companyName: "サンプル株式会社",
-            employeeName: "山田 太郎",
-            position: "開発部長",
-            email: "taishi.saito@onesteps.net",
-            imageUrl: "https://via.placeholder.com/150",
-            status: false,
-        },
-        {
-            id: "2",
-            uploadedAt: "2024-03-15 14:28:10",
-            companyName: "テスト合同会社",
-            employeeName: "鈴木 花子",
-            position: "シニアエンジニア",
-            email: "taichi.saito@algomatic.jp",
-            imageUrl: "https://via.placeholder.com/150",
-            status: false,
-        },
-        {
-            id: "3",
-            uploadedAt: "2024-03-15 14:25:00",
-            companyName: "株式会社ABC",
-            employeeName: "佐藤 次郎",
-            position: "営業部長",
-            email: "sato@abc.co.jp",
-            imageUrl: "https://via.placeholder.com/150",
-            status: false,
-        },
-    ]);
-
-    const [selectedRecords, setSelectedRecords] = useState<string[]>([]);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [emailContent, setEmailContent] = useState<EmailDialog>({
-        subject: '',
-        body: ''
-    });
-
-    const handleCheckboxChange = (id: string) => {
-        setSelectedRecords((prevSelected) => {
-            if (prevSelected.includes(id)) {
-                return prevSelected.filter((recordId) => recordId !== id);
-            }
-            return [...prevSelected, id];
-        });
-    };
-
-    const handleSendMail = () => {
-        setIsDialogOpen(true);
-    };
-
-    const handleEmailSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        const emails = records
-            .filter((record) => selectedRecords.includes(record.id))
-            .map((record) => record.email)
-            .join(",");
-
-        const mailtoLink = `mailto:${emails}?subject=${encodeURIComponent(emailContent.subject)}&body=${encodeURIComponent(emailContent.body)}`;
-        window.location.href = mailtoLink;
-        setIsDialogOpen(false);
-        setEmailContent({ subject: '', body: '' });
-    };
-
+    const {
+        selectedRecords,
+        handleSendMail,
+        records,
+        handleCheckboxChange,
+        isDialogOpen,
+        setIsDialogOpen,
+        handleEmailSubmit,
+        emailContent,
+        setEmailContent
+    } = useRecordHooks()
     return (
         <div className="mx-auto max-w-7xl p-6">
             <div className="sm:flex sm:items-center justify-between mb-8">
