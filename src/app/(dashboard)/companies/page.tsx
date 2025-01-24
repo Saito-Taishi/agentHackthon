@@ -189,7 +189,7 @@ export default function CompaniesPage() {
                     <div className="flex items-start space-x-4 p-4">
                       <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                         <Image
-                          src={"public/vercel.svg"}
+                          src={"/next.svg"}
                           width={500}
                           height={500}
                           alt="名刺"
