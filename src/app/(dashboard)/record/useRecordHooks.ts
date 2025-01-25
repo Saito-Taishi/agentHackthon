@@ -10,12 +10,6 @@ interface BusinessCard {
     status: boolean;
 }
 
-interface EmailDialog {
-    subject: string;
-    body: string;
-}
-
-
 export function useRecordHooks(){
     // 後でAPIから取得する形に変更
     const [records] = useState<BusinessCard[]>([
@@ -52,11 +46,6 @@ export function useRecordHooks(){
     ]);
 
     const [selectedRecords, setSelectedRecords] = useState<string[]>([]);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [emailContent, setEmailContent] = useState<EmailDialog>({
-        subject: '',
-        body: ''
-    });
 
     const handleCheckboxChange = (id: string) => {
         setSelectedRecords((prevSelected) => {
@@ -67,42 +56,9 @@ export function useRecordHooks(){
         });
     };
 
-    const handleSendMail = () => {
-        setIsDialogOpen(true);
-    };
-
-    const handleEmailSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            const response = await fetch('/api/record/mail', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to send email');
-            }
-
-            setIsDialogOpen(false);
-            setEmailContent({ subject: '', body: '' });
-            alert('メールを送信しました');
-        } catch (error) {
-            console.error('Error sending email:', error);
-            alert('メール送信に失敗しました');
-        }
-    };
-
     return{
         selectedRecords,
-        handleSendMail,
         records,
         handleCheckboxChange,
-        isDialogOpen,
-        setIsDialogOpen,
-        handleEmailSubmit,
-        emailContent,
-        setEmailContent,
     }
 }

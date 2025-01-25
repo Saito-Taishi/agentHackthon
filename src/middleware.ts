@@ -6,7 +6,7 @@ export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
   // 保護するパスのリスト
-  const protectedPaths = ['/history', '/upload'];
+  const protectedPaths = ['/history', '/upload','/record'];
 
   // 保護されたパスへのアクセスをチェック
   if (protectedPaths.some(protectedPath => path.startsWith(protectedPath))) {
