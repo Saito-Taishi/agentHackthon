@@ -1,5 +1,6 @@
 import type { DocumentReference } from "firebase-admin/firestore";
 import { adminFirestore } from "@/utils/config/firebase-admin";
+import { Timestamp } from "firebase/firestore";
 
 export type BusinessCardData = {
   // 必須フィールド
@@ -17,8 +18,8 @@ export type BusinessCardData = {
   memo?: string;
 
   // システムフィールド
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 };
 
 export type CreateBusinessCardInput = Omit<BusinessCardData, "createdAt" | "updatedAt">;
@@ -31,8 +32,8 @@ export async function createBusinessCard(
   const now = new Date();
   const data: BusinessCardData = {
     ...input,
-    createdAt: now,
-    updatedAt: now,
+    createdAt: Timestamp.fromDate(now),
+    updatedAt: Timestamp.fromDate(now),
   };
   // biome-ignore lint/complexity/noForEach: <explanation>
   Object.keys(data).forEach(
@@ -55,16 +56,4 @@ export async function getBusinessCard(id: string): Promise<BusinessCardData | nu
     return null;
   }
   return doc.data() as BusinessCardData;
-}
-
-export async function getBusinessCardsByUserId(
-  userId: string | DocumentReference,
-): Promise<BusinessCardData[]> {
-  const snapshot = await adminFirestore
-    .collection(COLLECTION_NAME)
-    .where("userId", "==", userId)
-    .orderBy("createdAt", "desc")
-    .get();
-
-  return snapshot.docs.map((doc) => doc.data() as BusinessCardData);
 }
