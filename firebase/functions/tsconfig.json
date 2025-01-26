@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
+    "module": "CommonJS",
     "esModuleInterop": true,
-    "moduleResolution": "nodenext",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "outDir": "lib",
@@ -12,5 +11,5 @@
   },
   "compileOnSave": true,
   "include": ["src"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules/**/*"]
 }
