@@ -2,27 +2,16 @@
 
 import { useState } from "react";
 import heic2any from "heic2any";
+import type { Card } from "@/utils/types/card";
+import type { APIResponse } from "@/utils/api/response";
 
-type UploadResult = {
-  success: boolean;
-  message: string;
-  result: {
-    companyName: string;
-    position: string;
-    name: string;
-    mail: string;
-    phoneNumber: string;
-    companyAddress: string;
-    companyUrl: string;
-  };
-  documentId: string;
-};
+type UploadResponse = APIResponse<Card>;
 
 export function useImageUpload() {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadResults, setUploadResults] = useState<UploadResult[]>([]);
+  const [uploadResults, setUploadResults] = useState<UploadResponse[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   // ----
@@ -120,27 +109,32 @@ export function useImageUpload() {
         const response = await fetch("/api/business_cards/upload", {
           method: "POST",
           body: formData,
+          credentials: "include", // セッションCookieを送信するために必要
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "アップロードに失敗しました");
+        const data = (await response.json()) as UploadResponse;
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "アップロードに失敗しました");
         }
 
         completedFiles++;
         setUploadProgress(Math.round((completedFiles / totalFiles) * 100));
 
-        return response.json() as Promise<UploadResult>;
+        return data;
       });
 
       // すべてのアップロードを待機
       const results = await Promise.all(uploadPromises);
       setUploadResults(results);
       console.log("アップロード結果:", results);
+
+      // アップロード完了後に画像選択をクリア
+      setSelectedImages([]);
+      setUploadProgress(0);
     } catch (error: unknown) {
       console.error("画像アップロードエラー:", error);
-      if (error instanceof Error) setError(error.message);
-      else setError("画像のアップロードに失敗しました");
+      setError(error instanceof Error ? error.message : "アップロード中にエラーが発生しました");
     } finally {
       setIsLoading(false);
     }
