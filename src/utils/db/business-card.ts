@@ -34,6 +34,12 @@ export async function createBusinessCard(
     createdAt: now,
     updatedAt: now,
   };
+  // biome-ignore lint/complexity/noForEach: <explanation>
+  Object.keys(data).forEach(
+    (key) =>
+      data[key as keyof BusinessCardData] === undefined &&
+      delete data[key as keyof BusinessCardData],
+  );
 
   const docRef = await adminFirestore.collection(COLLECTION_NAME).add(data);
 
