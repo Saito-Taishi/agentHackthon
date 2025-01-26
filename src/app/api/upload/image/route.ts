@@ -5,11 +5,13 @@ import * as hub from "langchain/hub";
 
 // 下記みたいな形で型定義して欲しいっす！
 type Card = {
-  company: {
-    name: string;
-  };
-  phoneNumber: string;
-  email: string;
+  companyName:string;
+  position:string;// 役職
+  name:string; //ユーザの名前
+  mail: string;//メールアドレス
+  phoneNumber: string; //電話番号
+  companyAddress:string//会社住所
+  companyUrl:string //会社URL
 };
 
 export async function POST(request: Request) {
