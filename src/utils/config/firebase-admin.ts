@@ -1,6 +1,6 @@
-import { initializeApp, getApps, cert } from "firebase-admin/app";
-import { initializeFirestore } from "firebase-admin/firestore";
+import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
 
 const firebaseAdminConfig = {
   credential: cert({
@@ -10,14 +10,7 @@ const firebaseAdminConfig = {
   }),
 };
 
-export function initializeFirebaseAdmin() {
-  const app = getApps().length === 0 ? initializeApp(firebaseAdminConfig) : getApps()[0];
-  const db = initializeFirestore(app);
-  db.settings({ ignoreUndefinedProperties: true });
-  const auth = getAuth(app);
+const app = getApps().length === 0 ? initializeApp(firebaseAdminConfig) : getApps()[0];
 
-  return { app, db, auth };
-}
-
-// シングルトンとしてエクスポート
-export const { db: adminFirestore, auth: adminAuth } = initializeFirebaseAdmin();
+export const adminAuth = getAuth();
+export const adminFirestore = getFirestore(app);
