@@ -50,18 +50,16 @@ export function useImageUpload() {
   const handleRemoveImage = (indexToRemove: number) => {
     setSelectedFiles((prevFiles) => prevFiles.filter((_, index) => index !== indexToRemove));
     setSelectedImages((prevImages) => prevImages.filter((_, index) => index !== indexToRemove));
-    console.log("何個のファイルがセットされているか？",selectedFiles.length)
   };
 
 
   //名刺をスキャン
   const handleSubmit = async () => {
-    console.log("選択されている枚数は",selectedFiles)
-    setIsLoading(true)
     if (selectedImages.length === 0) {
       setError("画像が選択されていません")
       return;
     }
+    setIsLoading(true)
     setError(null)
     try {
       const results: UploadResponse[] = [];
