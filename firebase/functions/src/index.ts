@@ -1,19 +1,29 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+import * as admin from "firebase-admin";
+import * as functions from "firebase-functions/v1";
 
-import {onRequest} from "firebase-functions/v2/https";
-import * as logger from "firebase-functions/logger";
+// Firebase Adminの初期化
+admin.initializeApp();
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+// ユーザー作成時のトリガー関数
+export const createUserDocument = functions.auth
+  .user()
+  .onCreate(async (user: admin.auth.UserRecord) => {
+    try {
+      const { email, displayName } = user;
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+      const userData = {
+        name: displayName || "",
+        email: email || "",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+
+      // Firestoreにユーザー情報を保存
+      await admin.firestore().collection("users").doc(user.uid).set(userData);
+
+      console.log(`新規ユーザーのデータを保存しました: ${user.uid}`);
+    } catch (error) {
+      console.error("ユーザーデータの保存中にエラーが発生しました:", error);
+      throw error;
+    }
+  });
