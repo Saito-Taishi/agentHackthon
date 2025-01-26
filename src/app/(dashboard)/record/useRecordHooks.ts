@@ -1,55 +1,52 @@
-import { useState } from "react";
-interface BusinessCard {
+import { useState, useEffect } from "react";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { db } from "@/utils/config/firebase";
+import type { BusinessCardData } from "@/utils/db/business-card";
+
+interface BusinessCard extends BusinessCardData {
   id: string;
-  uploadedAt: string;
-  companyName: string;
-  employeeName: string;
-  position: string;
-  email: string;
-  phoneNumber: string;
-  imageUrl: string;
   status: boolean;
+  imageUrl: string;
 }
 
 export function useRecordHooks() {
-  // 後でAPIから取得する形に変更
-  const [records] = useState<BusinessCard[]>([
-    {
-      id: "1",
-      uploadedAt: "2024-03-15 14:30:25",
-      companyName: "サンプル株式会社",
-      employeeName: "山田 太郎",
-      position: "開発部長",
-      email: "taishi.saito@onesteps.net",
-      phoneNumber: "08040360619",
-      imageUrl: "https://via.placeholder.com/150",
-      status: false,
-    },
-    {
-      id: "2",
-      uploadedAt: "2024-03-15 14:28:10",
-      companyName: "テスト合同会社",
-      employeeName: "鈴木 花子",
-      position: "シニアエンジニア",
-      email: "taichi.saito@algomatic.jp",
-      phoneNumber: "08040360619",
-      imageUrl: "https://via.placeholder.com/150",
-      status: false,
-    },
-    {
-      id: "3",
-      uploadedAt: "2024-03-15 14:25:00",
-      companyName: "株式会社ABC",
-      employeeName: "佐藤 次郎",
-      position: "営業部長",
-      email: "sato@abc.co.jp",
-      phoneNumber: "08040360619",
-      imageUrl: "https://via.placeholder.com/150",
-      status: false,
-    },
-  ]);
-
+  const [records, setRecords] = useState<BusinessCard[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedRecords, setSelectedRecords] = useState<string[]>([]);
+
+  console.log("records", records);
+
+  useEffect(() => {
+    const businessCardsRef = collection(db, "business_cards");
+    const q = query(businessCardsRef, orderBy("createdAt", "desc"));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const businessCards = snapshot.docs.map((doc) => {
+          const data = doc.data() as BusinessCardData;
+          return {
+            ...data,
+            id: doc.id,
+            imageUrl: "https://via.placeholder.com/150", // TODO: 実際の画像URLを設定
+            status: false, // TODO: ステータスの管理方法を検討
+          };
+        });
+        setRecords(businessCards);
+        setLoading(false);
+        setError(null);
+      },
+      (err) => {
+        console.error("Error fetching business cards:", err);
+        setError("名刺データの取得中にエラーが発生しました");
+        setLoading(false);
+      },
+    );
+
+    // クリーンアップ関数でリスナーを解除
+    return () => unsubscribe();
+  }, []);
 
   const handleCheckboxChange = (id: string) => {
     setSelectedRecords((prevSelected) => {
@@ -63,6 +60,8 @@ export function useRecordHooks() {
   return {
     selectedRecords,
     records,
+    loading,
+    error,
     handleCheckboxChange,
   };
 }
