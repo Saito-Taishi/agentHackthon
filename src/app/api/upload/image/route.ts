@@ -3,6 +3,15 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatOpenAI } from "@langchain/openai";
 import * as hub from "langchain/hub";
 
+// 下記みたいな形で型定義して欲しいっす！
+type Card = {
+  company: {
+    name: string;
+  };
+  phoneNumber: string;
+  email: string;
+};
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
