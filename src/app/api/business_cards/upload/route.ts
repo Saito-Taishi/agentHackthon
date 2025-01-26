@@ -1,10 +1,17 @@
-import { NextResponse } from "next/server";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatOpenAI } from "@langchain/openai";
 import * as hub from "langchain/hub";
 import { getFirestore } from "firebase-admin/firestore";
 import { initializeApp } from "firebase-admin/app";
 import { getApps } from "firebase-admin/app";
+import { validateSession } from "@/utils/auth/session";
+import { type Card, isCard } from "@/utils/types/card";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  handleAPIError,
+  type APISuccessResponse,
+} from "@/utils/api/response";
 
 // Firebase初期化
 if (!getApps().length) {
@@ -12,44 +19,20 @@ if (!getApps().length) {
 }
 const db = getFirestore();
 
-type Card = {
-  companyName: string;
-  position: string;
-  name: string;
-  mail: string;
-  phoneNumber: string;
-  companyAddress: string;
-  companyUrl: string;
+type UploadResponse = APISuccessResponse<Card> & {
+  documentId: string;
 };
-
-function isCard(data: unknown): data is Card {
-  if (typeof data !== "object" || data === null) {
-    return false;
-  }
-
-  const card = data as Record<string, unknown>;
-  return (
-    typeof card.companyName === "string" &&
-    typeof card.position === "string" &&
-    typeof card.name === "string" &&
-    typeof card.mail === "string" &&
-    typeof card.phoneNumber === "string" &&
-    typeof card.companyAddress === "string" &&
-    typeof card.companyUrl === "string"
-  );
-}
 
 export async function POST(request: Request) {
   try {
+    // セッションの検証とユーザー情報の取得
+    const user = await validateSession();
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
 
     if (!file) {
-      return NextResponse.json({
-        success: false,
-        message: "ファイルがアップロードされていません",
-        error: "NO_FILE_UPLOADED",
-      }, { status: 400 });
+      return createErrorResponse("ファイルがアップロードされていません", "NO_FILE_UPLOADED", 400);
     }
 
     const arrayBuffer = await file.arrayBuffer();
@@ -75,48 +58,27 @@ export async function POST(request: Request) {
     // 型チェックと変換
     const responseData = JSON.parse(JSON.stringify(response));
     if (!isCard(responseData)) {
-      return NextResponse.json({
-        success: false,
-        message: "名刺情報の形式が正しくありません",
-        error: "INVALID_CARD_FORMAT",
-      }, { status: 400 });
+      return createErrorResponse("名刺情報の形式が正しくありません", "INVALID_CARD_FORMAT", 400);
     }
 
-    // Firestoreに保存
+    // Firestoreに保存（ユーザー情報を含める）
     const docRef = await db.collection("businessCards").add({
       ...responseData,
+      createdBy: user.uid,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "名刺画像の処理とデータ保存が完了しました",
-      result: responseData,
-      documentId: docRef.id,
-    });
+    return createSuccessResponse<UploadResponse>(
+      {
+        success: true,
+        message: "名刺画像の処理とデータ保存が完了しました",
+        result: responseData,
+        documentId: docRef.id,
+      },
+      "名刺画像の処理とデータ保存が完了しました",
+    );
   } catch (error: unknown) {
-    console.error("Error processing image:", error);
-
-    let errorMessage = "不明なエラーが発生しました";
-    let errorCode = "UNKNOWN_ERROR";
-
-    if (error instanceof Error) {
-      if (error.message.includes("Firestore")) {
-        errorMessage = "データベース接続エラー";
-        errorCode = "DATABASE_ERROR";
-      } else if (error.message.includes("AI")) {
-        errorMessage = "AI処理エラー";
-        errorCode = "AI_PROCESSING_ERROR";
-      } else {
-        errorMessage = error.message;
-      }
-    }
-
-    return NextResponse.json({
-      success: false,
-      message: `エラーが発生しました: ${errorMessage}`,
-      error: errorCode,
-    }, { status: 500 });
+    return handleAPIError(error);
   }
 }
