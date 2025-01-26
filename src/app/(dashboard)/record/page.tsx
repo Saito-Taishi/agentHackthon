@@ -64,20 +64,20 @@ export default function RecordPage() {
                     {record.companyName}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
-                    {record.employeeName}
+                    {record.personName}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {record.position}
+                    {record.role||"N/A"}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-blue-600">
                     <a
-                      href={`mailto:${record.email}`}
+                      href={`mailto:${record.personEmail}`}
                       className="hover:text-blue-800 hover:underline"
                     >
-                      {record.email}
+                      {record.personEmail||"N/A"}
                     </a>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm">{record.phoneNumber}</td>
+                  <td className="whitespace-nowrap px-3 py-4 text-sm">{record.personPhoneNumber}</td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm">
                     <span
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
@@ -88,7 +88,7 @@ export default function RecordPage() {
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {record.uploadedAt}
+                    {record.createdAt?.toDate().toLocaleString()}
                   </td>
                 </tr>
               ))}
