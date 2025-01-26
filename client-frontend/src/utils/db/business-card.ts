@@ -1,6 +1,6 @@
 import type { DocumentReference } from "firebase-admin/firestore";
 import { adminFirestore } from "@/utils/config/firebase-admin";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "firebase-admin/firestore";
 
 export type BusinessCardData = {
   // 必須フィールド
