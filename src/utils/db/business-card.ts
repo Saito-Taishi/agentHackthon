@@ -7,12 +7,13 @@ export type BusinessCardData = {
   personEmail: string;
   personPhoneNumber: string;
   createdBy: string | DocumentReference;
-
+  companyName: string;
   // オプショナルフィールド
   tradeShowId?: string | DocumentReference;
   companyId?: string | DocumentReference;
   websiteURL?: string;
-  position?: string;
+  role?: string;
+  companyAddress?: string;
   memo?: string;
 
   // システムフィールド
@@ -20,10 +21,7 @@ export type BusinessCardData = {
   updatedAt: Date;
 };
 
-export type CreateBusinessCardInput = Omit<BusinessCardData, "createdAt" | "updatedAt"> & {
-  personEmail?: string;
-  companyName?: string;
-};
+export type CreateBusinessCardInput = Omit<BusinessCardData, "createdAt" | "updatedAt">;
 
 const db = getFirestore();
 const COLLECTION_NAME = "business_cards";

@@ -1,6 +1,6 @@
 export type Card = {
   companyName: string;
-  position: string;
+  role: string;
   name: string;
   mail: string;
   phoneNumber: string;

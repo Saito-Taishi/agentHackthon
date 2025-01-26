@@ -1,25 +1,17 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatOpenAI } from "@langchain/openai";
 import * as hub from "langchain/hub";
-import { getFirestore } from "firebase-admin/firestore";
-import { initializeApp } from "firebase-admin/app";
-import { getApps } from "firebase-admin/app";
 import { validateSession } from "@/utils/auth/session";
-import { type Card, isCard } from "@/utils/types/card";
+import { isCard } from "@/utils/types/card";
 import {
   createErrorResponse,
   createSuccessResponse,
   handleAPIError,
   type APISuccessResponse,
 } from "@/utils/api/response";
+import { type BusinessCardData, createBusinessCard } from "@/utils/db/business-card";
 
-// Firebase初期化
-if (!getApps().length) {
-  initializeApp();
-}
-const db = getFirestore();
-
-type UploadResponse = APISuccessResponse<Card> & {
+type UploadResponse = APISuccessResponse<BusinessCardData> & {
   documentId: string;
 };
 
@@ -61,20 +53,23 @@ export async function POST(request: Request) {
       return createErrorResponse("名刺情報の形式が正しくありません", "INVALID_CARD_FORMAT", 400);
     }
 
-    // Firestoreに保存（ユーザー情報を含める）
-    const docRef = await db.collection("businessCards").add({
-      ...responseData,
+    // Firestoreに保存
+    const { id, data } = await createBusinessCard({
+      personName: responseData.name,
+      personEmail: responseData.mail,
+      personPhoneNumber: responseData.phoneNumber,
+      role: responseData.role,
+      websiteURL: responseData.companyUrl,
       createdBy: user.uid,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      companyName: responseData.companyName,
     });
 
     return createSuccessResponse<UploadResponse>(
       {
         success: true,
         message: "名刺画像の処理とデータ保存が完了しました",
-        result: responseData,
-        documentId: docRef.id,
+        result: data,
+        documentId: id,
       },
       "名刺画像の処理とデータ保存が完了しました",
     );
