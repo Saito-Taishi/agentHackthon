@@ -1,0 +1,67 @@
+{
+  "defaultDocument": {
+    "overview": "展示会特化型の名刺管理アプリケーションです。\n展示会で交換した名刺を写真撮影し、データベースに保存できます。また、名刺に記載されたウェブサイトの情報を参照して、最適な挨拶メールを作成・送信することができます。",
+    "architecture": {
+      "frontend": "Nextjs (App Router)",
+      "backend": "Firebase (Firestore, Cloud Functions, Authentication, Storage)",
+      "deployment": "Firebase Hosting",
+      "others": "GEMINI, GPT"
+    },
+    "databaseSchema": {
+      "trade_shows": [
+        { "field": "name", "type": "string", "description": "展示会名" },
+        { "field": "startDate", "type": "timestamp", "description": "開催開始日/時" },
+        { "field": "endDate", "type": "timestamp", "description": "開催終了日/時" },
+        { "field": "location", "type": "string", "description": "開催場所" },
+        { "field": "createdBy", "type": "string / DocumentReference", "description": "登録ユーザー ID (オプション)" },
+        { "field": "createdAt", "type": "timestamp", "description": "登録日時" },
+        { "field": "updatedAt", "type": "timestamp", "description": "更新日時" }
+      ],
+      "companies": [
+        { "field": "name", "type": "string", "description": "企業名" },
+        { "field": "websiteURL", "type": "string", "description": "企業サイト URL" },
+        { "field": "address", "type": "string", "description": "住所" },
+        { "field": "phone", "type": "string", "description": "代表電話番号" },
+        { "field": "description", "type": "string", "description": "企業概要や紹介文" },
+        { "field": "createdAt", "type": "timestamp", "description": "登録日時" },
+        { "field": "updatedAt", "type": "timestamp", "description": "更新日時" }
+      ],
+      "business_cards": [
+        { "field": "userId", "type": "string / DocumentReference", "description": "登録したユーザー ID", "optional": true },
+        { "field": "tradeShowId", "type": "string / DocumentReference", "description": "どの展示会で得た名刺か", "optional": true },
+        { "field": "companyId", "type": "string / DocumentReference", "description": "どの企業に紐づく名刺か", "optional": true },
+        { "field": "personName", "type": "string", "description": "名刺の個人名" },
+        { "field": "personEmail", "type": "string", "description": "個人のメールアドレス（挨拶メール送信先）" },
+        { "field": "personPhoneNumber", "type": "string", "description": "電話番号" },
+        { "field": "websiteURL", "type": "string", "description": "名刺に記載の個人/企業サイト URL", "optional": true },
+        { "field": "position", "type": "string", "description": "役職/肩書き", "optional": true },
+        { "field": "memo", "type": "string", "description": "メモ欄", "optional": true },
+        { "field": "createdAt", "type": "timestamp", "description": "登録日時" },
+        { "field": "updatedAt", "type": "timestamp", "description": "更新日時" }
+      ],
+      "users": [
+        { "field": "displayName", "type": "string", "description": "表示名" },
+        { "field": "email", "type": "string", "description": "メールアドレス" },
+        { "field": "photoURL", "type": "string", "description": "プロフィール画像の URL" },
+        { "field": "createdAt", "type": "timestamp", "description": "登録日時" },
+        { "field": "updatedAt", "type": "timestamp", "description": "更新日時" }
+      ],
+      "email_drafts": [
+        { "field": "userId", "type": "string / DocumentReference", "description": "下書きを作成したユーザー ID" },
+        { "field": "subject", "type": "string", "description": "メール件名 (テンプレートまたは下書きのタイトル)" },
+        { "field": "body", "type": "string", "description": "メール本文 (テンプレート本文)" },
+        { "field": "placeholders", "type": "object / array", "description": "{companyName}, {personName} など差し込みに使うプレースホルダ管理", "optional": true },
+        { "field": "createdAt", "type": "timestamp", "description": "下書き作成日時" },
+        { "field": "updatedAt", "type": "timestamp", "description": "更新日時" }
+      ],
+      "email_logs": [
+        { "field": "businessCardId", "type": "string / DocumentReference", "description": "どの名刺宛てに送ったメールか" },
+        { "field": "toEmail", "type": "string", "description": "送信先メールアドレス" },
+        { "field": "mailSubject", "type": "string", "description": "送信時のメール件名" },
+        { "field": "mailBody", "type": "string", "description": "送信時のメール本文 (プレースホルダが展開された状態)" },
+        { "field": "sentAt", "type": "timestamp", "description": "実際にメールを送信した日時" },
+        { "field": "status", "type": "string", "description": "送信状況 (成功/失敗 等)", "optional": true }
+      ]
+    }
+  }
+}
