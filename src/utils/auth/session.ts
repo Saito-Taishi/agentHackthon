@@ -1,4 +1,4 @@
-import { auth } from "@/utils/config/firebase-admin";
+import { adminAuth } from "@/utils/config/firebase-admin";
 import { cookies } from "next/headers";
 
 export type SessionUser = {
@@ -24,7 +24,7 @@ export async function validateSession(): Promise<SessionUser> {
   }
 
   try {
-    const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+    const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
     return {
       uid: decodedClaims.uid,
       email: decodedClaims.email,

@@ -1,5 +1,5 @@
-import { getFirestore } from "firebase-admin/firestore";
 import type { DocumentReference } from "firebase-admin/firestore";
+import { adminFirestore } from "@/utils/config/firebase-admin";
 
 export type BusinessCardData = {
   // 必須フィールド
@@ -23,7 +23,6 @@ export type BusinessCardData = {
 
 export type CreateBusinessCardInput = Omit<BusinessCardData, "createdAt" | "updatedAt">;
 
-const db = getFirestore();
 const COLLECTION_NAME = "business_cards";
 
 export async function createBusinessCard(
@@ -36,7 +35,7 @@ export async function createBusinessCard(
     updatedAt: now,
   };
 
-  const docRef = await db.collection(COLLECTION_NAME).add(data);
+  const docRef = await adminFirestore.collection(COLLECTION_NAME).add(data);
 
   return {
     id: docRef.id,
@@ -45,7 +44,7 @@ export async function createBusinessCard(
 }
 
 export async function getBusinessCard(id: string): Promise<BusinessCardData | null> {
-  const doc = await db.collection(COLLECTION_NAME).doc(id).get();
+  const doc = await adminFirestore.collection(COLLECTION_NAME).doc(id).get();
   if (!doc.exists) {
     return null;
   }
@@ -55,7 +54,7 @@ export async function getBusinessCard(id: string): Promise<BusinessCardData | nu
 export async function getBusinessCardsByUserId(
   userId: string | DocumentReference,
 ): Promise<BusinessCardData[]> {
-  const snapshot = await db
+  const snapshot = await adminFirestore
     .collection(COLLECTION_NAME)
     .where("userId", "==", userId)
     .orderBy("createdAt", "desc")
