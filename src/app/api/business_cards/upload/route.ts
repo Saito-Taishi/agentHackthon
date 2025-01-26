@@ -47,8 +47,9 @@ export async function POST(request: Request) {
     if (!file) {
       return NextResponse.json({
         success: false,
-        message: "No file uploaded.",
-      });
+        message: "ファイルがアップロードされていません",
+        error: "NO_FILE_UPLOADED",
+      }, { status: 400 });
     }
 
     const arrayBuffer = await file.arrayBuffer();
@@ -74,7 +75,11 @@ export async function POST(request: Request) {
     // 型チェックと変換
     const responseData = JSON.parse(JSON.stringify(response));
     if (!isCard(responseData)) {
-      throw new Error("Invalid card data format");
+      return NextResponse.json({
+        success: false,
+        message: "名刺情報の形式が正しくありません",
+        error: "INVALID_CARD_FORMAT",
+      }, { status: 400 });
     }
 
     // Firestoreに保存
@@ -86,16 +91,32 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Image processed and data saved successfully",
+      message: "名刺画像の処理とデータ保存が完了しました",
       result: responseData,
       documentId: docRef.id,
     });
   } catch (error: unknown) {
     console.error("Error processing image:", error);
+
+    let errorMessage = "不明なエラーが発生しました";
+    let errorCode = "UNKNOWN_ERROR";
+
+    if (error instanceof Error) {
+      if (error.message.includes("Firestore")) {
+        errorMessage = "データベース接続エラー";
+        errorCode = "DATABASE_ERROR";
+      } else if (error.message.includes("AI")) {
+        errorMessage = "AI処理エラー";
+        errorCode = "AI_PROCESSING_ERROR";
+      } else {
+        errorMessage = error.message;
+      }
+    }
+
     return NextResponse.json({
       success: false,
-      message: "Error processing the image",
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
+      message: `エラーが発生しました: ${errorMessage}`,
+      error: errorCode,
+    }, { status: 500 });
   }
 }
