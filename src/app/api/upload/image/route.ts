@@ -34,7 +34,6 @@ export async function POST(request: Request) {
     const openaiModel = new ChatOpenAI({model:"gpt-4o-mini", temperature: 0})
     const openaiChain = textToJsonPrompt.pipe(openaiModel)
     const response = await openaiChain.invoke({"text":cardInfo})
-    console.log("AI Response:", response);
 
     return NextResponse.json({
       success: true,

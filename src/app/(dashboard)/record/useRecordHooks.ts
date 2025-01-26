@@ -6,6 +6,7 @@ interface BusinessCard {
     employeeName: string;
     position: string;
     email: string;
+    phoneNumber:string;
     imageUrl: string;
     status: boolean;
 }
@@ -20,6 +21,7 @@ export function useRecordHooks(){
             employeeName: "山田 太郎",
             position: "開発部長",
             email: "taishi.saito@onesteps.net",
+            phoneNumber:"08040360619",
             imageUrl: "https://via.placeholder.com/150",
             status: false,
         },
@@ -30,6 +32,7 @@ export function useRecordHooks(){
             employeeName: "鈴木 花子",
             position: "シニアエンジニア",
             email: "taichi.saito@algomatic.jp",
+            phoneNumber:"08040360619",
             imageUrl: "https://via.placeholder.com/150",
             status: false,
         },
@@ -40,6 +43,7 @@ export function useRecordHooks(){
             employeeName: "佐藤 次郎",
             position: "営業部長",
             email: "sato@abc.co.jp",
+            phoneNumber:"08040360619",
             imageUrl: "https://via.placeholder.com/150",
             status: false,
         },
