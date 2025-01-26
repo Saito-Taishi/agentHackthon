@@ -38,6 +38,9 @@ export default function RecordPage() {
                                     メールアドレス
                                 </th>
                                 <th scope="col" className="px-3 py-4 text-left text-sm font-semibold text-gray-900">
+                                    電話番号
+                                </th>
+                                <th scope="col" className="px-3 py-4 text-left text-sm font-semibold text-gray-900">
                                     ステータス
                                 </th>
                                 <th scope="col" className="px-3 py-4 text-left text-sm font-semibold text-gray-900">
@@ -75,6 +78,9 @@ export default function RecordPage() {
                                         >
                                             {record.email}
                                         </a>
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                            {record.phoneNumber}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">
                                         <span
