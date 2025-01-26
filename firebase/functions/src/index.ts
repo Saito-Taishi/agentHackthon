@@ -1,25 +1,25 @@
-import * as admin from "firebase-admin";
-import * as functions from "firebase-functions/v1";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { auth } from "firebase-functions/v1";
+import { crawlCompanyInfo } from "./functions/company-info";
+import { onDocumentCreated } from "firebase-functions/firestore";
 
 // Firebase Adminの初期化
-admin.initializeApp();
-
+const firestore = getFirestore();
 // ユーザー作成時のトリガー関数
-export const createUserDocument = functions.auth
+export const createUserDocument = auth
   .user()
-  .onCreate(async (user: admin.auth.UserRecord) => {
+  .onCreate(async (user: auth.UserRecord) => {
     try {
       const { email, displayName } = user;
 
       const userData = {
         name: displayName || "",
         email: email || "",
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       };
 
-      // Firestoreにユーザー情報を保存
-      await admin.firestore().collection("users").doc(user.uid).set(userData);
+      await firestore.collection("users").doc(user.uid).set(userData);
 
       console.log(`新規ユーザーのデータを保存しました: ${user.uid}`);
     } catch (error) {
@@ -27,3 +27,17 @@ export const createUserDocument = functions.auth
       throw error;
     }
   });
+
+export const scrapeCompanyInfo = onDocumentCreated(
+  "business_cards/{id}",
+  async (event) => {
+    const snapshot = event.data?.data();
+    if (!snapshot) {
+      // TODO error handling
+      return;
+    }
+
+    const companyInfo = await crawlCompanyInfo(snapshot.url);
+    await firestore.collection("companies").add(companyInfo);
+  }
+);

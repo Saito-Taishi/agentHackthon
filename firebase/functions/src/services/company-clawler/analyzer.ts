@@ -20,7 +20,6 @@ export class CompanyAnalyzer {
       const hrefSelectPrompt = await hub.pull("zenn_selected_href");
       const openaiChain = hrefSelectPrompt.pipe(this.model);
       const result = await openaiChain.invoke({ question: data });
-      
       return result.url || null;
     } catch (error) {
       console.error("Error finding company overview URL:", error);
@@ -31,7 +30,9 @@ export class CompanyAnalyzer {
   /**
    * 会社概要ページから情報を抽出する
    */
-  async analyzeCompanyOverview(data: CompanyOverviewData): Promise<CompanyInfo> {
+  async analyzeCompanyOverview(
+    data: CompanyOverviewData
+  ): Promise<CompanyInfo> {
     try {
       const companyOverviewPrompt = await hub.pull("zenn_company_overview");
       const openaiChain = companyOverviewPrompt.pipe(this.model);
