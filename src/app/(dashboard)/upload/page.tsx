@@ -1,17 +1,12 @@
-'use client';
+"use client";
 
-import { useImageUpload } from './useUploadHooks';
-import Image from 'next/image';
+import { useImageUpload } from "./useUploadHooks";
+import Image from "next/image";
 import { v4 as uuidv4 } from "uuid";
 
 export default function UploadPage() {
-  const {
-    selectedImages,
-    isLoading,
-    handleImageSelect,
-    handleRemoveImage,
-    handleSubmit,
-  } = useImageUpload();
+  const { selectedImages, isLoading, handleImageSelect, handleRemoveImage, handleSubmit } =
+    useImageUpload();
 
   return (
     <div className="container mx-auto max-w-3xl">
@@ -20,14 +15,15 @@ export default function UploadPage() {
         <h1 className="text-2xl font-bold">名刺画像を選択</h1>
         {/* 実行ボタン */}
         <button
-          type='button'
+          type="button"
           onClick={handleSubmit}
           disabled={!selectedImages || isLoading}
           className={`
             px-6 py-2.5 rounded-lg font-medium text-white
-            ${!selectedImages || isLoading
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-700'
+            ${
+              !selectedImages || isLoading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
             }
             transition-colors
           `}
@@ -58,7 +54,7 @@ export default function UploadPage() {
               処理中...
             </span>
           ) : (
-            '実行する'
+            "実行する"
           )}
         </button>
       </div>
@@ -117,12 +113,7 @@ export default function UploadPage() {
               >
                 <div className="space-y-3">
                   <div className="relative w-full h-[160px]">
-                    <Image
-                      src={imageWithId.url}
-                      alt=""
-                      fill
-                      className="rounded-md object-cover"
-                    />
+                    <Image src={imageWithId.url} alt="" fill className="rounded-md object-cover" />
                   </div>
                   <button
                     onClick={() => handleRemoveImage(selectedImages.indexOf(imageWithId.url))}

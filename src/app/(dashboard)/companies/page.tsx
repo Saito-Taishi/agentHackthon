@@ -1,7 +1,7 @@
 "use client";
 import type React from "react";
 import { useCompaniesHooks } from "./useCompaniesHooks";
-import Image from 'next/image'
+import Image from "next/image";
 
 export default function CompaniesPage() {
   const {
@@ -11,7 +11,7 @@ export default function CompaniesPage() {
     selectedCompanyName,
     selectedCompanyId,
     handleCompanyNameClick,
-    getEmployeesByCompanyId
+    getEmployeesByCompanyId,
   } = useCompaniesHooks();
 
   const selectedEmployees = selectedCompanyId ? getEmployeesByCompanyId(selectedCompanyId) : [];
@@ -21,9 +21,7 @@ export default function CompaniesPage() {
       <div className="sm:flex sm:items-center mb-8">
         <div className="sm:flex-auto">
           <h1 className="text-2xl font-semibold text-gray-900">企業一覧</h1>
-          <p className="mt-2 text-sm text-gray-700">
-            登録されている企業の一覧です
-          </p>
+          <p className="mt-2 text-sm text-gray-700">登録されている企業の一覧です</p>
         </div>
       </div>
 
@@ -32,75 +30,94 @@ export default function CompaniesPage() {
           <table className="min-w-full divide-y divide-gray-300">
             <thead>
               <tr className="bg-gray-50">
-                <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 min-w-[160px]">
+                <th
+                  scope="col"
+                  className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 min-w-[160px]"
+                >
                   会社名
                 </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[100px]">
+                <th
+                  scope="col"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[100px]"
+                >
                   上場区分
                 </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[100px]">
+                <th
+                  scope="col"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[100px]"
+                >
                   従業員数
                 </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[100px]">
+                <th
+                  scope="col"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[100px]"
+                >
                   売上
                 </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[200px]">
+                <th
+                  scope="col"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[200px]"
+                >
                   本社住所
                 </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[100px]">
+                <th
+                  scope="col"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[100px]"
+                >
                   資本金
                 </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[120px]">
+                <th
+                  scope="col"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[120px]"
+                >
                   設立
                 </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[200px]">
+                <th
+                  scope="col"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[200px]"
+                >
                   事業内容
                 </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[140px]">
+                <th
+                  scope="col"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[140px]"
+                >
                   URL
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {companies.map((company) => (
-                <tr
-                  key={company.id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
+                <tr key={company.id} className="hover:bg-gray-50 transition-colors">
                   <td className="py-4 pl-4 pr-3 text-sm sm:pl-6">
                     <button
                       className="font-semibold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
                       type="button"
                       onClick={() => {
-                        handleCompanyNameClick(company.companyName, company.id)
+                        handleCompanyNameClick(company.companyName, company.id);
                       }}
                     >
                       {company.companyName}
                     </button>
                   </td>
                   <td className="px-3 py-4 text-sm text-gray-500">
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${company.IPO === "上場"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-gray-100 text-gray-800"
-                      }`}>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        company.IPO === "上場"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
                       {company.IPO}
                     </span>
                   </td>
                   <td className="px-3 py-4 text-sm text-gray-500">
                     {company.employeeCount.toLocaleString()}
                   </td>
-                  <td className="px-3 py-4 text-sm text-gray-500">
-                    {company.sales}
-                  </td>
-                  <td className="px-3 py-4 text-sm text-gray-500">
-                    {company.headOfficeAddress}
-                  </td>
-                  <td className="px-3 py-4 text-sm text-gray-500">
-                    {company.capital}
-                  </td>
-                  <td className="px-3 py-4 text-sm text-gray-500">
-                    {company.established}
-                  </td>
+                  <td className="px-3 py-4 text-sm text-gray-500">{company.sales}</td>
+                  <td className="px-3 py-4 text-sm text-gray-500">{company.headOfficeAddress}</td>
+                  <td className="px-3 py-4 text-sm text-gray-500">{company.capital}</td>
+                  <td className="px-3 py-4 text-sm text-gray-500">{company.established}</td>
                   <td className="px-3 py-4 text-sm text-gray-500">
                     <div className="flex flex-wrap gap-1.5">
                       {company.businessActivities.map((business) => (
@@ -132,8 +149,9 @@ export default function CompaniesPage() {
 
       {/* サイドバー */}
       <div
-        className={`fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${open ? 'translate-x-0' : 'translate-x-full'
-          }`}
+        className={`fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+          open ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <div className="h-full overflow-y-auto">
           <div className="p-6 border-b border-gray-200">
@@ -153,11 +171,7 @@ export default function CompaniesPage() {
                   aria-label="閉じる"
                 >
                   <title>close</title>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
@@ -188,17 +202,10 @@ export default function CompaniesPage() {
                   >
                     <div className="flex items-start space-x-4 p-4">
                       <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Image
-                          src={"/next.svg"}
-                          width={500}
-                          height={500}
-                          alt="名刺"
-                        />
+                        <Image src={"/next.svg"} width={500} height={500} alt="名刺" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-lg font-bold text-gray-900 mb-1">
-                          {employee.name}
-                        </h4>
+                        <h4 className="text-lg font-bold text-gray-900 mb-1">{employee.name}</h4>
                         <div className="space-y-2">
                           <p className="flex items-center text-sm text-gray-600">
                             <svg
@@ -272,4 +279,3 @@ export default function CompaniesPage() {
     </div>
   );
 }
-

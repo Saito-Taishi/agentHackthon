@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from 'react';
-import heic2any from 'heic2any';
+import { useState } from "react";
+import heic2any from "heic2any";
 
 export function useImageUpload() {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
@@ -18,25 +18,27 @@ export function useImageUpload() {
 
     // ファイルを1枚ずつ確認しながらプレビュー用URLを作成
     for (const file of Array.from(files)) {
-      const isHeic = file.type.includes('heic') || file.type.includes('heif')
-        || file.name.toLowerCase().endsWith('.heic')
-        || file.name.toLowerCase().endsWith('.heif');
+      const isHeic =
+        file.type.includes("heic") ||
+        file.type.includes("heif") ||
+        file.name.toLowerCase().endsWith(".heic") ||
+        file.name.toLowerCase().endsWith(".heif");
 
       if (isHeic) {
         try {
           const convertedBlob = await heic2any({
             blob: file,
-            toType: 'image/png',
+            toType: "image/png",
           });
           const convertedURL = URL.createObjectURL(convertedBlob as Blob);
 
           newImageUrls.push(convertedURL);
         } catch (err) {
-          console.error('HEIC→JPEG変換中にエラー:', err);
+          console.error("HEIC→JPEG変換中にエラー:", err);
         }
       } else {
         // 通常の画像の場合はそのままURL化
-        if (file.type.startsWith('image/')) {
+        if (file.type.startsWith("image/")) {
           const imageUrl = URL.createObjectURL(file);
           newImageUrls.push(imageUrl);
         }
@@ -46,11 +48,8 @@ export function useImageUpload() {
   };
 
   const handleRemoveImage = (indexToRemove: number) => {
-    setSelectedImages((prevImages) =>
-      prevImages.filter((_, index) => index !== indexToRemove)
-    );
+    setSelectedImages((prevImages) => prevImages.filter((_, index) => index !== indexToRemove));
   };
-
 
   const handleSubmit = async () => {
     if (selectedImages.length === 0) return;
@@ -67,21 +66,23 @@ export function useImageUpload() {
       // 各画像に対して個別にAPIリクエストを送信
       const uploadPromises = Array.from(files).map(async (file) => {
         const formData = new FormData();
-        
+
         // HEICファイルの場合はPNGに変換
-        const isHeic = file.type.includes('heic') || file.type.includes('heif')
-          || file.name.toLowerCase().endsWith('.heic')
-          || file.name.toLowerCase().endsWith('.heif');
+        const isHeic =
+          file.type.includes("heic") ||
+          file.type.includes("heif") ||
+          file.name.toLowerCase().endsWith(".heic") ||
+          file.name.toLowerCase().endsWith(".heif");
 
         if (isHeic) {
           try {
             const convertedBlob = await heic2any({
               blob: file,
-              toType: 'image/png',
+              toType: "image/png",
             });
-            formData.append("file", convertedBlob as Blob, file.name.replace(/\.heic$/i, '.png'));
+            formData.append("file", convertedBlob as Blob, file.name.replace(/\.heic$/i, ".png"));
           } catch (err) {
-            console.error('HEIC→PNG変換中にエラー:', err);
+            console.error("HEIC→PNG変換中にエラー:", err);
             throw err;
           }
         } else {
@@ -103,7 +104,6 @@ export function useImageUpload() {
       // すべてのアップロードを待機
       const results = await Promise.all(uploadPromises);
       console.log("Upload results:", results);
-
     } catch (error) {
       console.error("Error uploading images:", error);
     } finally {

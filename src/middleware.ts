@@ -1,24 +1,24 @@
 // middleware.js
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
-  const session = req.cookies.get('session');
+  const session = req.cookies.get("session");
   const path = req.nextUrl.pathname;
 
   // 保護するパスのリスト
-  const protectedPaths = ['/history', '/upload','/record'];
+  const protectedPaths = ["/history", "/upload", "/record"];
 
   // 保護されたパスへのアクセスをチェック
-  if (protectedPaths.some(protectedPath => path.startsWith(protectedPath))) {
+  if (protectedPaths.some((protectedPath) => path.startsWith(protectedPath))) {
     if (!session) {
-      return NextResponse.redirect(new URL('/login', req.url));
+      return NextResponse.redirect(new URL("/login", req.url));
     }
   }
 
   // ログインページへのアクセス制御
-  if (path === '/login') {
+  if (path === "/login") {
     if (session) {
-      return NextResponse.redirect(new URL('/upload', req.url));
+      return NextResponse.redirect(new URL("/upload", req.url));
     }
   }
 
@@ -26,9 +26,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/history',
-    '/upload',
-    '/login',
-  ],
+  matcher: ["/history", "/upload", "/login"],
 };

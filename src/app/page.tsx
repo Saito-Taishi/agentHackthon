@@ -4,10 +4,10 @@ import HomeHeader from "@/components/homeHeader";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const router = useRouter()
+  const router = useRouter();
   return (
     <>
-      <HomeHeader/>
+      <HomeHeader />
       <main>
         <section className="relative overflow-hidden bg-gradient-to-r from-sky-50 to-blue-100 dark:from-gray-800 dark:to-gray-900">
           <div className="mx-auto max-w-7xl px-6 py-16 text-center sm:py-24 lg:px-8">
@@ -22,7 +22,13 @@ export default function Home() {
               で、あなたのビジネスを加速させましょう。
             </p>
             <div className="mt-8 flex justify-center gap-4">
-              <button onClick={()=>{router.push("/login")}} type="button" className="rounded-md bg-blue-600 px-5 py-3 text-base font-medium text-white hover:bg-blue-700">
+              <button
+                onClick={() => {
+                  router.push("/login");
+                }}
+                type="button"
+                className="rounded-md bg-blue-600 px-5 py-3 text-base font-medium text-white hover:bg-blue-700"
+              >
                 無料で始める
               </button>
             </div>
@@ -36,8 +42,7 @@ export default function Home() {
               サービスの特長
             </h2>
             <p className="mt-3 text-gray-600 dark:text-gray-300">
-              面倒な経理・人事・総務を一元管理し、
-              バックオフィス業務の効率化を実現します。
+              面倒な経理・人事・総務を一元管理し、 バックオフィス業務の効率化を実現します。
             </p>
           </div>
 
@@ -75,7 +80,13 @@ export default function Home() {
               無料トライアルですぐに始められます。
             </p>
             <div className="mt-8 flex justify-center gap-4">
-              <button onClick={()=>{router.push("/login")}} type="button" className="inline-block rounded-md bg-blue-600 px-5 py-3 text-base font-medium text-white hover:bg-blue-700">
+              <button
+                onClick={() => {
+                  router.push("/login");
+                }}
+                type="button"
+                className="inline-block rounded-md bg-blue-600 px-5 py-3 text-base font-medium text-white hover:bg-blue-700"
+              >
                 今すぐ始める
               </button>
             </div>
