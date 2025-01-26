@@ -38,6 +38,9 @@ importers:
       firebase-admin:
         specifier: ^13.0.2
         version: 13.0.2
+      heic2any:
+        specifier: ^0.0.4
+        version: 0.0.4
       langchain:
         specifier: ^0.3.12
         version: 0.3.12(@langchain/core@0.3.32(openai@4.79.1(ws@8.18.0)(zod@3.24.1)))(@langchain/google-genai@0.1.6(@langchain/core@0.3.32(openai@4.79.1(ws@8.18.0)(zod@3.24.1)))(zod@3.24.1))(@langchain/google-vertexai@0.1.8(@langchain/core@0.3.32(openai@4.79.1(ws@8.18.0)(zod@3.24.1)))(zod@3.24.1))(openai@4.79.1(ws@8.18.0)(zod@3.24.1))(ws@8.18.0)
@@ -1960,6 +1963,9 @@ packages:
   hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
+
+  heic2any@0.0.4:
+    resolution: {integrity: sha512-3lLnZiDELfabVH87htnRolZ2iehX9zwpRyGNz22GKXIu0fznlblf0/ftppXKNqS26dqFSeqfIBhAmAj/uSp0cA==}
 
   hoist-non-react-statics@3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
@@ -5846,6 +5852,8 @@ snapshots:
   hasown@2.0.2:
     dependencies:
       function-bind: 1.1.2
+
+  heic2any@0.0.4: {}
 
   hoist-non-react-statics@3.3.2:
     dependencies:
