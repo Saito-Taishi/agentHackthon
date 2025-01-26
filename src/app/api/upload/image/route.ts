@@ -2,23 +2,48 @@ import { NextResponse } from "next/server";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatOpenAI } from "@langchain/openai";
 import * as hub from "langchain/hub";
+import { getFirestore } from "firebase-admin/firestore";
+import { initializeApp } from "firebase-admin/app";
+import { getApps } from "firebase-admin/app";
 
-// 下記みたいな形で型定義して欲しいっす！
+// Firebase初期化
+if (!getApps().length) {
+  initializeApp();
+}
+const db = getFirestore();
+
 type Card = {
-  companyName:string;
-  position:string;// 役職
-  name:string; //ユーザの名前
-  mail: string;//メールアドレス
-  phoneNumber: string; //電話番号
-  companyAddress:string//会社住所
-  companyUrl:string //会社URL
+  companyName: string;
+  position: string;
+  name: string;
+  mail: string;
+  phoneNumber: string;
+  companyAddress: string;
+  companyUrl: string;
 };
+
+function isCard(data: unknown): data is Card {
+  if (typeof data !== "object" || data === null) {
+    return false;
+  }
+
+  const card = data as Record<string, unknown>;
+  return (
+    typeof card.companyName === "string" &&
+    typeof card.position === "string" &&
+    typeof card.name === "string" &&
+    typeof card.mail === "string" &&
+    typeof card.phoneNumber === "string" &&
+    typeof card.companyAddress === "string" &&
+    typeof card.companyUrl === "string"
+  );
+}
 
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-
     const file = formData.get("file") as File | null;
+
     if (!file) {
       return NextResponse.json({
         success: false,
@@ -28,10 +53,10 @@ export async function POST(request: Request) {
 
     const arrayBuffer = await file.arrayBuffer();
     const base64 = Buffer.from(arrayBuffer).toString("base64");
-
     const mimeType = file.type;
     const imageUrl = `data:${mimeType};base64,${base64}`;
 
+    // AI処理
     const geminiModel = new ChatGoogleGenerativeAI({
       model: "gemini-1.5-flash",
       temperature: 0,
@@ -46,17 +71,31 @@ export async function POST(request: Request) {
     const openaiChain = textToJsonPrompt.pipe(openaiModel);
     const response = await openaiChain.invoke({ text: cardInfo });
 
+    // 型チェックと変換
+    const responseData = JSON.parse(JSON.stringify(response));
+    if (!isCard(responseData)) {
+      throw new Error("Invalid card data format");
+    }
+
+    // Firestoreに保存
+    const docRef = await db.collection("businessCards").add({
+      ...responseData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
     return NextResponse.json({
       success: true,
-      message: "Image processed successfully",
-      result: response,
+      message: "Image processed and data saved successfully",
+      result: responseData,
+      documentId: docRef.id,
     });
   } catch (error: unknown) {
     console.error("Error processing image:", error);
     return NextResponse.json({
       success: false,
       message: "Error processing the image",
-      error: String(error),
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 }
