@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "format:check": "biome format --check ."
   },
   "dependencies": {
     "@chakra-ui/react": "^3.4.0",
@@ -33,6 +35,7 @@
     "uuid": "^11.0.5"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.8.0",
     "@eslint/eslintrc": "^3",
     "@types/node": "^20.17.14",
     "@types/react": "^19",
