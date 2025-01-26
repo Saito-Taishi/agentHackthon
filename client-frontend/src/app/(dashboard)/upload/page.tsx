@@ -85,18 +85,12 @@ export default function UploadPage() {
               クリックして画像を選択（HEICも可）
             </span>
           </div>
-          {/*
-            accept属性はHEICやHEIFを含めるために拡張しています。
-            - 画像全般: image/*
-            - HEIC拡張子: .heic, .HEIC
-          */}
           <input
             id="image-upload"
             type="file"
             className="hidden"
             accept="image/*,.heic,.HEIC"
             onChange={handleImageSelect}
-            multiple
           />
         </label>
       </div>
