@@ -7,8 +7,35 @@ export default function RecordPage() {
   const { records, handleCheckboxChange, selectedRecords } = useRecordHooks();
   const hasSelectedRecords = selectedRecords.length > 0; // 選択されたレコードがあるかどうか
 
+
+
+  const handleGoogleLogin = async () => {
+    try {
+      // 1. initiateエンドポイントにリクエストし、認可URLを取得
+      const res = await fetch("/api/auth/oauth_google");
+      if (!res.ok) {
+        throw new Error("Failed to get authorization URL");
+      }
+      const data = await res.json();
+
+      // 2. 取得したURLにリダイレクト (画面遷移)
+      window.location.href = data.authorizationUrl;
+    } catch (error) {
+      console.error(error);
+    }
+
+  };
+
+
+
+
+
   return (
     <div className="mx-auto max-w-7xl p-6">
+      {/* クリック時にAPIを呼んで認可URLを取得→リダイレクト */}
+      <button onClick={handleGoogleLogin}>
+        a
+      </button>
       <div className="sm:flex sm:items-center justify-between mb-8">
         <div className="sm:flex-auto">
           <h1 className="text-2xl font-semibold text-gray-900">アップロード履歴</h1>
