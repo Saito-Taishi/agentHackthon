@@ -21,13 +21,38 @@ export default function RecordClientComponent() {
             console.error(error);
         }
     };
+    const handleSendEmail = async () => {
+        try {
+            const response = await fetch("/api/send_emails", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("Error details:", data);
+                throw new Error(data.message || 'Failed to send email');
+            }
+
+            console.log('Email sent successfully:', data);
+            // 成功時のUI表示を追加
+        } catch (error) {
+            console.error("Error sending email:", error);
+            // エラー時のUI表示を追加
+        }
+    };
 
     return (
         <div className="mx-auto max-w-7xl p-6">
             {/* クリック時にAPIを呼んで認可URLを取得→リダイレクト */}
             <button onClick={handleGoogleLogin}>
                 a
+            </button>
+            <button onClick={handleSendEmail}>
+                メール送信テスト用
             </button>
             <div className="sm:flex sm:items-center justify-between mb-8">
                 <div className="sm:flex-auto">

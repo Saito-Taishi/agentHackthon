@@ -4,15 +4,18 @@ import crypto from "crypto";
 import oauthClient from "@/utils/auth/google_oauth"; // 既存のOAuthクライアント設定を読み込み
 
 export async function GET() {
-  const SCOPE = [
-    "https://www.googleapis.com/auth/gmail.compose",
-    "https://www.googleapis.com/auth/gmail.readonly",
+  const SCOPES = [
+    'https://www.googleapis.com/auth/gmail.send',
+    'https://www.googleapis.com/auth/gmail.compose',
+    'https://www.googleapis.com/auth/gmail.modify',
+    'profile',
+    'email'
   ];
   const state =  crypto.randomBytes(16).toString("hex");
 
   const authorizationUrl = oauthClient.generateAuthUrl({
     access_type: "offline",
-    scope: SCOPE,
+    scope: SCOPES,
     state,
   });
   console.log("認証URLは",authorizationUrl)
