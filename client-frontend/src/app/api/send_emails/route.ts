@@ -3,12 +3,11 @@ import { google } from "googleapis"
 import { cookies } from "next/headers"
 
 
+
 export async function POST(request: Request) {
     const cookieStore = await cookies()
     const accessToken = cookieStore.get("google_access_token")?.value
-    
-    console.log("Access Token:", accessToken ? "存在します" : "存在しません");
-    
+
     if (!accessToken) {
         return new Response(JSON.stringify({ message: "No access token found" }), {
             status: 401,
@@ -27,13 +26,10 @@ export async function POST(request: Request) {
     }
 
     oauthClient.setCredentials({ access_token: accessToken })
-    
-    console.log("やあ")
-    // 3. Gmail Clientの初期化
+
+    // Gmail Clientの初期化
     const gmail = google.gmail({ version: 'v1', auth: oauthClient });
-
     const subject = 'テストメール from Next.js';
-
     const messageText = `
     以下のレコードを選択しました:
     これはテスト送信です。
@@ -70,9 +66,9 @@ export async function POST(request: Request) {
             },
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Failed to send email:", error);
-        return new Response(JSON.stringify({ message: "Failed to send email", error: error.message }), {
+        return new Response(JSON.stringify({ message: "Failed to send email", error: error }), {
             status: 500,
             headers: {
                 'Content-Type': 'application/json',
