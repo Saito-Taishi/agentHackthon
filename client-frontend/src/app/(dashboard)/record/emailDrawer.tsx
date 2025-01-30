@@ -29,8 +29,8 @@ export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }
     const [emailBody, setEmailBody] = useState("")
     // プレースホルダーを管理するステート
     const [placeholders] = useState([
-        { key: 'personName', label: '氏名', placeholder: '{氏名}' },
         { key: 'companyName', label: '会社名', placeholder: '{会社名}' },
+        { key: 'personName', label: '氏名', placeholder: '{氏名}' },
     ]);
 
     const handleSendEmail = async () => {
@@ -106,6 +106,7 @@ export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }
                             <label htmlFor="body" className="block text-sm font-medium text-gray-700 mb-1">
                                 本文
                             </label>
+                            {/* ラベル入力欄 */}
                             <div className="flex items-center gap-2 mb-1">
                                 {placeholders.map((p) => (
                                     <button
@@ -118,6 +119,7 @@ export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }
                                     </button>
                                 ))}
                             </div>
+                            {/* メール内容入力欄 */}
                             <textarea
                                 id="body"
                                 value={emailBody}

@@ -9,8 +9,8 @@ export async function GET(req: Request) {
     const error = searchParams.get('error');
 
     if (error) {
-        return NextResponse.json({ error: 'Google OAuth Error: ' + error });
-      }
+        return NextResponse.json({ error:  error });
+    }
 
     if (!code) {
         return NextResponse.json({ error: 'Authorization code not found' });
@@ -33,7 +33,7 @@ export async function GET(req: Request) {
         return response;
 
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to exchange code for access token' + error });
+        return NextResponse.json({ error: error });
     }
 
 }
