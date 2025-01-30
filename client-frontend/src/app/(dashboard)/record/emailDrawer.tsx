@@ -12,14 +12,17 @@ import {
 } from "@/components/ui/drawer"
 import type { SelectedRecords } from "./useRecordHooks"
 
+
+
 interface EmailDrawerProps {
     open: boolean
-    onOpenChange: (open: boolean) => void
+    setOpen: (open: boolean) => void
     selectedRecords: SelectedRecords[]
-    onSendEmail: () => Promise<void>
+    sendEmail: () => Promise<void>
+    googleLogin: () => Promise<void>
 }
 
-export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }: EmailDrawerProps) => {
+export const EmailDrawer = ({ open, setOpen, selectedRecords, sendEmail, googleLogin }: EmailDrawerProps) => {
     const [emailSubject, setEmailSubject] = useState("")
     const [emailBody, setEmailBody] = useState("")
     // プレースホルダーを管理するステート
@@ -29,11 +32,10 @@ export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }
     ]);
 
     const handleSendEmail = async () => {
-        await onSendEmail();
-        onOpenChange(false);
+        await sendEmail();
+        setOpen(false);
     }
 
-    const recordsToDisplay = selectedRecords;
 
     // プレースホルダーを実際の値に置換する関数
     const replacePlaceholders = (text: string, record: { personName: string, companyName: string }) => {
@@ -46,7 +48,7 @@ export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }
     };
 
     // プレビュー表示用のメール本文
-    const previewEmailBody = recordsToDisplay.length > 0 ? replacePlaceholders(emailBody, recordsToDisplay[0]) : emailBody;
+    const previewEmailBody = selectedRecords.length > 0 ? replacePlaceholders(emailBody, selectedRecords[0]) : emailBody;
 
 
     const insertPlaceholder = (placeholder: string) => {
@@ -55,16 +57,16 @@ export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }
 
 
     return (
-        <DrawerRoot size={"lg"} open={open} onOpenChange={(e) => onOpenChange(e.open)}>
+        <DrawerRoot size={"lg"} open={open} onOpenChange={(e) => setOpen(e.open)}>
             <DrawerBackdrop />
             <DrawerContent>
                 <DrawerBody className="flex flex-col gap-6">
                     <div className="flex flex-col gap-3 bg-gray-50 p-4 rounded-lg">
                         <div className="text-sm text-gray-600 font-medium">
-                            送信先: {recordsToDisplay.length}件
+                            送信先: {selectedRecords.length}件
                         </div>
                         <div className="divide-y divide-gray-200">
-                            {recordsToDisplay.map((record) => (
+                            {selectedRecords.map((record) => (
                                 <div key={record.id} className="py-2">
                                     <div className="flex items-center gap-4">
                                         <span className="text-sm font-medium text-gray-900 w-40">
@@ -145,7 +147,7 @@ export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }
                         <button
                             type="button"
                             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-                            onClick={() => onOpenChange(false)}
+                            onClick={() => setOpen(false)}
                         >
                             キャンセル
                         </button>

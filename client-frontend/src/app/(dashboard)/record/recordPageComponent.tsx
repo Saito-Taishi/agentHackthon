@@ -5,55 +5,14 @@ import { useRecordHooks } from "./useRecordHooks";
 import { EmailDrawer } from "./emailDrawer";
 
 export default function RecordPageComponent() {
-    const { records, handleCheckboxChange, selectedRecords, open, setOpen } = useRecordHooks();
+    const { records, handleCheckboxChange, selectedRecords, open, setOpen, handleSendEmail, handleGoogleLogin } = useRecordHooks();
     const hasSelectedRecords = selectedRecords.length > 0; // 選択されたレコードがあるかどうか
-    const handleGoogleLogin = async () => {
-        try {
-            // 1. initiateエンドポイントにリクエストし、認可URLを取得
-            const res = await fetch("/api/auth/oauth_google");
-            if (!res.ok) {
-                throw new Error("Failed to get authorization URL");
-            }
-            const data = await res.json();
-
-            // 2. 取得したURLにリダイレクト (画面遷移)
-            window.location.href = data.authorizationUrl;
-        } catch (error) {
-            console.error(error);
-        }
-    };
-    const handleSendEmail = async () => {
-        try {
-            const response = await fetch("/api/send_emails", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                console.error("Error details:", data);
-                throw new Error(data.message || 'Failed to send email');
-            }
-
-            console.log('Email sent successfully:', data);
-            // 成功時のUI表示を追加
-        } catch (error) {
-            console.error("Error sending email:", error);
-            // エラー時のUI表示を追加
-        }
-    };
 
     return (
         <div className="mx-auto max-w-7xl p-6">
             {/* クリック時にAPIを呼んで認可URLを取得→リダイレクト */}
             <button type="button" onClick={handleGoogleLogin}>
                 a
-            </button>
-            <button type="button" onClick={handleSendEmail}>
-                メール送信テスト用
             </button>
             <div className="sm:flex sm:items-center justify-between mb-8">
                 <div className="sm:flex-auto">
@@ -171,7 +130,7 @@ export default function RecordPageComponent() {
                     </table>
                 </div>
             </div>
-            <EmailDrawer open={open} onOpenChange={setOpen} selectedRecords={selectedRecords} onSendEmail={handleSendEmail} />
+            <EmailDrawer open={open} setOpen={setOpen} selectedRecords={selectedRecords} sendEmail={handleSendEmail} googleLogin={handleGoogleLogin} />
         </div>
     )
 }

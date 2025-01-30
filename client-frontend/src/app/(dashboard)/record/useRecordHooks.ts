@@ -13,7 +13,7 @@ export type SelectedRecords = {
 	id: string;
 	companyName: string;
 	personEmail: string;
-  personName:string;
+	personName: string;
 };
 
 export function useRecordHooks() {
@@ -56,8 +56,6 @@ export function useRecordHooks() {
 		return () => unsubscribe();
 	}, []);
 
-
-  
 	const handleCheckboxChange = (recordId: string, record: SelectedRecords) => {
 		setSelectedRecords((prevSelectedRecords) => {
 			const alreadySelected = prevSelectedRecords.some(
@@ -84,6 +82,48 @@ export function useRecordHooks() {
 		});
 	};
 
+	//クリック時にAPIを呼んで認可URLを取得→リダイレクト
+	const handleGoogleLogin = async () => {
+		try {
+			// 1. initiateエンドポイントにリクエストし、認可URLを取得
+			const res = await fetch("/api/auth/oauth_google");
+			if (!res.ok) {
+				throw new Error("Failed to get authorization URL");
+			}
+			const data = await res.json();
+
+			// 2. 取得したURLにリダイレクト (画面遷移)
+			window.location.href = data.authorizationUrl;
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	// メール送信
+	const handleSendEmail = async () => {
+		try {
+			const response = await fetch("/api/send_emails", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+
+			const data = await response.json();
+
+			if (!response.ok) {
+				console.error("Error details:", data);
+				throw new Error(data.message || "Failed to send email");
+			}
+
+			console.log("Email sent successfully:", data);
+			// 成功時のUI表示を追加
+		} catch (error) {
+			console.error("Error sending email:", error);
+			// エラー時のUI表示を追加
+		}
+	};
+
 	return {
 		selectedRecords,
 		open,
@@ -92,5 +132,7 @@ export function useRecordHooks() {
 		loading,
 		error,
 		handleCheckboxChange,
+		handleSendEmail,
+		handleGoogleLogin,
 	};
 }
