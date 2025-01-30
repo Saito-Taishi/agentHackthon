@@ -10,19 +10,14 @@ import {
     DrawerFooter,
     DrawerRoot,
 } from "@/components/ui/drawer"
+import type { SelectedRecords } from "./useRecordHooks"
 
 interface EmailDrawerProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    selectedRecords: string[]
+    selectedRecords: SelectedRecords[]
     onSendEmail: () => Promise<void>
 }
-// ダミーデータ
-const dummyRecords = [
-    { companyName: "株式会社ABC", personName: "山田 太郎", personEmail: "taro.yamada@abc.co.jp" },
-    { companyName: "株式会社XYZ", personName: "佐藤 花子", personEmail: "hanako.sato@xyz.co.jp" },
-    { companyName: "株式会社123", personName: "鈴木 一郎", personEmail: "ichiro.suzuki@123.co.jp" },
-];
 
 export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }: EmailDrawerProps) => {
     const [emailSubject, setEmailSubject] = useState("")
@@ -38,7 +33,7 @@ export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }
         onOpenChange(false);
     }
 
-    const recordsToDisplay = dummyRecords;
+    const recordsToDisplay = selectedRecords;
 
     // プレースホルダーを実際の値に置換する関数
     const replacePlaceholders = (text: string, record: { personName: string, companyName: string }) => {
@@ -70,7 +65,7 @@ export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }
                         </div>
                         <div className="divide-y divide-gray-200">
                             {recordsToDisplay.map((record) => (
-                                <div key={record.companyName} className="py-2">
+                                <div key={record.id} className="py-2">
                                     <div className="flex items-center gap-4">
                                         <span className="text-sm font-medium text-gray-900 w-40">
                                             {record.companyName}

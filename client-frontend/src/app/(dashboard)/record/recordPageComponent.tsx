@@ -121,8 +121,8 @@ export default function RecordPageComponent() {
                                             type="checkbox"
                                             className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
                                             value={record.id}
-                                            checked={selectedRecords.includes(record.id)}
-                                            onChange={() => handleCheckboxChange(record.id)}
+                                            checked={selectedRecords.some(selectedRecord => selectedRecord.id === record.id)}
+                                            onChange={() => handleCheckboxChange(record.id, record)}
                                         />
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">
