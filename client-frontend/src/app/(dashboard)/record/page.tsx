@@ -1,7 +1,7 @@
 
 import { cookies } from "next/headers";
 import oauthClient from "@/utils/auth/google_oauth";
-import RecordClientComponent from "./recordPage";
+import RecordPageComponent from "./recordPageComponent";
 
 export default async function RecordPage() {
 
@@ -11,7 +11,7 @@ export default async function RecordPage() {
 
   return (
     <>
-      <RecordClientComponent />
+      <RecordPageComponent />
     </>
   );
 }
