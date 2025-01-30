@@ -2,21 +2,10 @@
 
 import Image from "next/image";
 import { useRecordHooks } from "./useRecordHooks";
-import {
-    DrawerActionTrigger,
-    DrawerBackdrop,
-    DrawerBody,
-    DrawerCloseTrigger,
-    DrawerContent,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerRoot,
-    DrawerTitle,
-} from "@/components/ui/drawer"
-import { useState } from "react"
+import { EmailDrawer } from "./emailDrawer";
 
 export default function RecordPageComponent() {
-    const { records, handleCheckboxChange, selectedRecords } = useRecordHooks();
+    const { records, handleCheckboxChange, selectedRecords, open, setOpen } = useRecordHooks();
     const hasSelectedRecords = selectedRecords.length > 0; // 選択されたレコードがあるかどうか
     const handleGoogleLogin = async () => {
         try {
@@ -57,15 +46,13 @@ export default function RecordPageComponent() {
         }
     };
 
-    const [open, setOpen] = useState(false)
-
     return (
         <div className="mx-auto max-w-7xl p-6">
             {/* クリック時にAPIを呼んで認可URLを取得→リダイレクト */}
-            <button onClick={handleGoogleLogin}>
+            <button type="button" onClick={handleGoogleLogin}>
                 a
             </button>
-            <button onClick={handleSendEmail}>
+            <button type="button" onClick={handleSendEmail}>
                 メール送信テスト用
             </button>
             <div className="sm:flex sm:items-center justify-between mb-8">
@@ -81,10 +68,6 @@ export default function RecordPageComponent() {
                         className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
                         onClick={() => {
                             setOpen(true);
-                            if (hasSelectedRecords) {
-                                // TODO: メール送信処理を実装する
-
-                            }
                         }}
                     >
                         メール送信
@@ -188,28 +171,7 @@ export default function RecordPageComponent() {
                     </table>
                 </div>
             </div>
-
-            <DrawerRoot open={open} onOpenChange={(e) => setOpen(e.open)}>
-                <DrawerBackdrop />
-                <DrawerContent>
-                    <DrawerHeader>
-                        <DrawerTitle>Drawer Title</DrawerTitle>
-                    </DrawerHeader>
-                    <DrawerBody>
-                        <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-                            eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                        </p>
-                    </DrawerBody>
-                    <DrawerFooter>
-                        <DrawerActionTrigger asChild>
-                            <button onClick={()=>setOpen(false)}>Cancel</button>
-                        </DrawerActionTrigger>
-                        <button onClick={()=>{console.log("やあ")}}>Save</button>
-                    </DrawerFooter>
-                    <DrawerCloseTrigger />
-                </DrawerContent>
-            </DrawerRoot>
+            <EmailDrawer open={open} onOpenChange={setOpen} selectedRecords={selectedRecords} onSendEmail={handleSendEmail} />
         </div>
     )
 }

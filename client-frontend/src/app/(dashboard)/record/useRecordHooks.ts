@@ -15,6 +15,8 @@ export function useRecordHooks() {
   const [error, setError] = useState<string | null>(null);
   const [selectedRecords, setSelectedRecords] = useState<string[]>([]);
 
+
+  const [open, setOpen] = useState<boolean>(false) // EmailDrawerの表示ロジック
   console.log("records", records);
 
   useEffect(() => {
@@ -59,6 +61,8 @@ export function useRecordHooks() {
 
   return {
     selectedRecords,
+    open,
+    setOpen,
     records,
     loading,
     error,
