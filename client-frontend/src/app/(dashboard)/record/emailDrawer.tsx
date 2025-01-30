@@ -8,9 +8,7 @@ import {
     DrawerCloseTrigger,
     DrawerContent,
     DrawerFooter,
-    DrawerHeader,
     DrawerRoot,
-    DrawerTitle,
 } from "@/components/ui/drawer"
 
 interface EmailDrawerProps {
@@ -45,10 +43,10 @@ export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }
     // プレースホルダーを実際の値に置換する関数
     const replacePlaceholders = (text: string, record: { personName: string, companyName: string }) => {
         let replacedText = text;
-        placeholders.forEach(p => {
-            const replacementValue = record[p.key as keyof typeof record] || ''; // recordにキーが存在しない場合も考慮
+        for (const p of placeholders) {
+            const replacementValue = record[p.key as keyof typeof record] || '';
             replacedText = replacedText.replace(p.placeholder, replacementValue);
-        });
+        }
         return replacedText;
     };
 
@@ -71,8 +69,8 @@ export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }
                             送信先: {recordsToDisplay.length}件
                         </div>
                         <div className="divide-y divide-gray-200">
-                            {recordsToDisplay.map((record, index) => (
-                                <div key={index} className="py-2">
+                            {recordsToDisplay.map((record) => (
+                                <div key={record.companyName} className="py-2">
                                     <div className="flex items-center gap-4">
                                         <span className="text-sm font-medium text-gray-900 w-40">
                                             {record.companyName}
@@ -130,9 +128,11 @@ export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }
                             />
                             {/* プレビュー表示 */}
                             {emailBody && (
-                                <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-200">
-                                    <div className="text-sm font-medium text-gray-700 mb-1">プレビュー (一件目):</div>
-                                    <p className="text-sm text-gray-800 whitespace-pre-line">{previewEmailBody}</p>
+                                <div>
+                                    <div className="text-sm font-medium text-gray-700 mb-1">1件目のプレビュー:</div>
+                                    <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-200">
+                                        <p className="text-sm text-gray-800 whitespace-pre-line">{previewEmailBody}</p>
+                                    </div>
                                 </div>
                             )}
                         </div>
