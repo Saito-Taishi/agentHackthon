@@ -12,6 +12,12 @@ import {
     DrawerRoot,
     DrawerTitle,
 } from "@/components/ui/drawer"
+import {
+    AccordionItem,
+    AccordionItemContent,
+    AccordionItemTrigger,
+    AccordionRoot,
+} from "@/components/ui/accordion"
 
 interface EmailDrawerProps {
     open: boolean
@@ -30,6 +36,7 @@ const dummyRecords = [
 export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }: EmailDrawerProps) => {
     const [emailSubject, setEmailSubject] = useState("")
     const [emailBody, setEmailBody] = useState("")
+    const [isRecipientListOpen, setIsRecipientListOpen] = useState(false)
 
     const handleSendEmail = async () => {
         await onSendEmail();
@@ -45,21 +52,33 @@ export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }
                 <DrawerHeader>
                     <DrawerTitle>メール送信確認</DrawerTitle>
                 </DrawerHeader>
-                <DrawerBody>
-                    <p className="text-gray-600 mb-4">
-                        選択された {recordsToDisplay.length} 件の名刺データに対してメールを送信します。
-                        送信先は以下の通りです。
-                    </p>
+                <DrawerBody className="flex flex-col gap-6">
+                    <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                        <div className="text-sm text-gray-600">
+                            送信先: {recordsToDisplay.length}件
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setIsRecipientListOpen(!isRecipientListOpen)}
+                            className="text-sm text-indigo-600 hover:text-indigo-500"
+                        >
+                            {isRecipientListOpen ? '閉じる' : '詳細を表示'}
+                        </button>
+                    </div>
 
-                    <ul className="space-y-2 mb-6">
-                        {recordsToDisplay.map((record, index) => (
-                            <li key={index} className="p-4 border rounded-md shadow-sm">
-                                <div className="font-semibold">{record.companyName}</div>
-                                <div className="text-gray-700">{record.personName}</div>
-                                <div className="text-blue-500 text-sm">{record.email}</div>
-                            </li>
-                        ))}
-                    </ul>
+                    {isRecipientListOpen && (
+                        <div className="bg-white border rounded-md p-2 max-h-40 overflow-y-auto">
+                            <ul className="space-y-1">
+                                {recordsToDisplay.map((record, index) => (
+                                    <li key={`${record.email}-${index}`} className="text-sm p-2 hover:bg-gray-50 rounded">
+                                        <span className="font-medium">{record.companyName}</span>
+                                        <span className="text-gray-600 mx-2">{record.personName}</span>
+                                        <span className="text-gray-500">{record.email}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                     <div className="space-y-4">
                         <div>
@@ -84,14 +103,14 @@ export const EmailDrawer = ({ open, onOpenChange, selectedRecords, onSendEmail }
                                 id="body"
                                 value={emailBody}
                                 onChange={(e) => setEmailBody(e.target.value)}
-                                rows={6}
+                                rows={10}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 placeholder="メールの本文を入力してください"
                             />
                         </div>
                     </div>
 
-                    <p className="text-sm text-gray-500 mt-4">
+                    <p className="text-sm text-gray-500">
                         送信ボタンを押すと、上記メールアドレス宛に一斉送信されます。
                         送信前に内容を再度ご確認ください。
                     </p>
