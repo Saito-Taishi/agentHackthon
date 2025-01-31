@@ -5,15 +5,11 @@ import { useRecordHooks } from "./useRecordHooks";
 import { EmailDrawer } from "./emailDrawer";
 
 export default function RecordPageComponent() {
-    const { records, handleCheckboxChange, selectedRecords, open, setOpen, handleSendEmail, handleGoogleLogin } = useRecordHooks();
+    const { records, handleCheckboxChange, selectedRecords, open, setOpen, handleSendEmail } = useRecordHooks();
     const hasSelectedRecords = selectedRecords.length > 0; // 選択されたレコードがあるかどうか
 
     return (
         <div className="mx-auto max-w-7xl p-6">
-            {/* クリック時にAPIを呼んで認可URLを取得→リダイレクト */}
-            <button type="button" onClick={handleGoogleLogin}>
-                a
-            </button>
             <div className="sm:flex sm:items-center justify-between mb-8">
                 <div className="sm:flex-auto">
                     <h1 className="text-2xl font-semibold text-gray-900">アップロード履歴</h1>
@@ -130,7 +126,7 @@ export default function RecordPageComponent() {
                     </table>
                 </div>
             </div>
-            <EmailDrawer open={open} setOpen={setOpen} selectedRecords={selectedRecords} sendEmail={handleSendEmail} googleLogin={handleGoogleLogin} />
+            <EmailDrawer open={open} setOpen={setOpen} selectedRecords={selectedRecords} sendEmail={handleSendEmail} />
         </div>
     )
 }

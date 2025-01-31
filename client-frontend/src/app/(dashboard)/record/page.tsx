@@ -10,7 +10,7 @@ export default async function RecordPage() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("google_access_token")?.value;
   const refreshToken = cookieStore.get("google_refresh_token")?.value;
-
+  console.log("refresh保存されとった",refreshToken)
 
   // 2. アクセストークンが無い場合 → 認可画面へリダイレクト
   if (!accessToken) {

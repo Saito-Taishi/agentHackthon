@@ -19,10 +19,9 @@ interface EmailDrawerProps {
     setOpen: (open: boolean) => void
     selectedRecords: SelectedRecords[]
     sendEmail: () => Promise<void>
-    googleLogin: () => Promise<void>
 }
 
-export const EmailDrawer = ({ open, setOpen, selectedRecords, sendEmail, googleLogin }: EmailDrawerProps) => {
+export const EmailDrawer = ({ open, setOpen, selectedRecords, sendEmail }: EmailDrawerProps) => {
     const [emailSubject, setEmailSubject] = useState("")
     const [emailBody, setEmailBody] = useState("")
     // プレースホルダーを管理するステート

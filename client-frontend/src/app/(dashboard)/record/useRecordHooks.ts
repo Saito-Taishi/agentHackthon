@@ -82,31 +82,31 @@ export function useRecordHooks() {
 		});
 	};
 
-	//クリック時にAPIを呼んで認可URLを取得→リダイレクト
-	const handleGoogleLogin = async () => {
-		try {
-			// 1. initiateエンドポイントにリクエストし、認可URLを取得
-			const res = await fetch("/api/auth/oauth_google");
-			if (!res.ok) {
-				throw new Error("Failed to get authorization URL");
-			}
-			const data = await res.json();
-
-			// 2. 取得したURLにリダイレクト (画面遷移)
-			window.location.href = data.authorizationUrl;
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
 	// メール送信
 	const handleSendEmail = async () => {
 		try {
+			// ダミーデータの作成
+			const emailsData = [
+				{
+					id: "1",
+					to: "taishi.saito@onesteps.net",
+					subject: "テストメール1",
+					message: "これはテストメール1の本文です。",
+				},
+				{
+					id: "2",
+					to: "sai10tai41112@gmail.com",
+					subject: "テストメール2",
+					message: "これはテストメール2の本文です。",
+				},
+			];
+
 			const response = await fetch("/api/send_emails", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
+				body: JSON.stringify({ emails: emailsData }),
 			});
 
 			const data = await response.json();
@@ -115,11 +115,10 @@ export function useRecordHooks() {
 				console.error("Error details:", data);
 				throw new Error(data.message || "Failed to send email");
 			}
-
-			console.log("Email sent successfully:", data);
+			console.log("Emails sent successfully:", data);
 			// 成功時のUI表示を追加
 		} catch (error) {
-			console.error("Error sending email:", error);
+			console.error("Error sending emails:", error);
 			// エラー時のUI表示を追加
 		}
 	};
@@ -133,6 +132,5 @@ export function useRecordHooks() {
 		error,
 		handleCheckboxChange,
 		handleSendEmail,
-		handleGoogleLogin,
 	};
 }
