@@ -10,7 +10,7 @@ import {
     DrawerFooter,
     DrawerRoot,
 } from "@/components/ui/drawer"
-import type { SelectedRecords } from "./useRecordHooks"
+import type { EmailPayload, SelectedRecords } from "./useRecordHooks"
 
 
 
@@ -18,22 +18,33 @@ interface EmailDrawerProps {
     open: boolean
     setOpen: (open: boolean) => void
     selectedRecords: SelectedRecords[]
-    sendEmail: () => Promise<void>
+    sendEmail: (emails: EmailPayload[]) => Promise<void>;
+    emailSubject: string
+    setEmailSubject: (subject: string) => void
 }
 
-export const EmailDrawer = ({ open, setOpen, selectedRecords, sendEmail }: EmailDrawerProps) => {
-    const [emailSubject, setEmailSubject] = useState("")
-    const [emailBody, setEmailBody] = useState("")
+export const EmailDrawer = ({ open, setOpen, selectedRecords, sendEmail, emailSubject, setEmailSubject }: EmailDrawerProps) => {
+    const [emailDraft, setEmailDraft] = useState("")
     // プレースホルダーを管理するステート
     const [placeholders] = useState([
         { key: 'companyName', label: '会社名', placeholder: '{会社名}' },
         { key: 'personName', label: '氏名', placeholder: '{氏名}' },
     ]);
 
+
     const handleSendEmail = async () => {
-        await sendEmail();
+        // For each record, build an object that includes id, to, subject, message
+        const emailsBody: EmailPayload[] = selectedRecords.map((record) => ({
+            id: record.id,
+            to: record.personEmail,
+            subject: emailSubject,
+            message: replacePlaceholders(emailDraft, record)
+        }));
+        console.log("メールの中身は",emailsBody)
+
+        await sendEmail(emailsBody);
         setOpen(false);
-    }
+    };
 
 
     // プレースホルダーを実際の値に置換する関数
@@ -46,12 +57,8 @@ export const EmailDrawer = ({ open, setOpen, selectedRecords, sendEmail }: Email
         return replacedText;
     };
 
-    // プレビュー表示用のメール本文
-    const previewEmailBody = selectedRecords.length > 0 ? replacePlaceholders(emailBody, selectedRecords[0]) : emailBody;
-
-
     const insertPlaceholder = (placeholder: string) => {
-        setEmailBody(prevBody => prevBody + placeholder);
+        setEmailDraft(prevBody => prevBody + placeholder);
     };
 
 
@@ -118,18 +125,18 @@ export const EmailDrawer = ({ open, setOpen, selectedRecords, sendEmail }: Email
                             {/* メール内容入力欄 */}
                             <textarea
                                 id="body"
-                                value={emailBody}
-                                onChange={(e) => setEmailBody(e.target.value)}
+                                value={emailDraft}
+                                onChange={(e) => setEmailDraft(e.target.value)}
                                 rows={10}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 placeholder="メールの本文を入力してください"
                             />
                             {/* プレビュー表示 */}
-                            {emailBody && (
+                            {emailDraft && (
                                 <div>
                                     <div className="text-sm font-medium text-gray-700 mb-1">1件目のプレビュー:</div>
                                     <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-200">
-                                        <p className="text-sm text-gray-800 whitespace-pre-line">{previewEmailBody}</p>
+                                        <p className="text-sm text-gray-800 whitespace-pre-line">{replacePlaceholders(emailDraft, selectedRecords[0])}</p>
                                     </div>
                                 </div>
                             )}
@@ -155,7 +162,7 @@ export const EmailDrawer = ({ open, setOpen, selectedRecords, sendEmail }: Email
                         type="button"
                         className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-500 disabled:bg-indigo-300"
                         onClick={handleSendEmail}
-                        disabled={!emailSubject.trim() || !emailBody.trim()}
+                        disabled={!emailSubject.trim() || !emailDraft.trim()}
                     >
                         送信する
                     </button>

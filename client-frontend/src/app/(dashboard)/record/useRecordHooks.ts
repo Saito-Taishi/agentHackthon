@@ -16,14 +16,20 @@ export type SelectedRecords = {
 	personName: string;
 };
 
+export interface EmailPayload {
+	id: string;
+	to: string;
+	subject: string;
+	message: string;
+}
+
 export function useRecordHooks() {
 	const [records, setRecords] = useState<BusinessCard[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [selectedRecords, setSelectedRecords] = useState<SelectedRecords[]>([]);
-
+	const [emailSubject, setEmailSubject] = useState<string>("");
 	const [open, setOpen] = useState<boolean>(false); // EmailDrawerの表示ロジック
-	console.log("records", records);
 
 	useEffect(() => {
 		const businessCardsRef = collection(db, "business_cards");
@@ -83,10 +89,12 @@ export function useRecordHooks() {
 	};
 
 	// メール送信
-	const handleSendEmail = async () => {
+	const handleSendEmail = async (emailsBody: EmailPayload[]) => {
+		console.log(emailsBody);
+
 		try {
 			// ダミーデータの作成
-			const emailsData = [
+			const emailsData: EmailPayload[] = [
 				{
 					id: "1",
 					to: "taishi.saito@onesteps.net",
@@ -132,5 +140,7 @@ export function useRecordHooks() {
 		error,
 		handleCheckboxChange,
 		handleSendEmail,
+		emailSubject,
+		setEmailSubject,
 	};
 }

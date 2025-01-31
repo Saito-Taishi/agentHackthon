@@ -5,7 +5,7 @@ import { useRecordHooks } from "./useRecordHooks";
 import { EmailDrawer } from "./emailDrawer";
 
 export default function RecordPageComponent() {
-    const { records, handleCheckboxChange, selectedRecords, open, setOpen, handleSendEmail } = useRecordHooks();
+    const { records, handleCheckboxChange, selectedRecords, open, setOpen, handleSendEmail, emailSubject, setEmailSubject } = useRecordHooks();
     const hasSelectedRecords = selectedRecords.length > 0; // 選択されたレコードがあるかどうか
 
     return (
@@ -126,7 +126,14 @@ export default function RecordPageComponent() {
                     </table>
                 </div>
             </div>
-            <EmailDrawer open={open} setOpen={setOpen} selectedRecords={selectedRecords} sendEmail={handleSendEmail} />
+            <EmailDrawer
+                open={open}
+                setOpen={setOpen}
+                selectedRecords={selectedRecords}
+                sendEmail={handleSendEmail}
+                emailSubject={emailSubject}
+                setEmailSubject={setEmailSubject}
+            />
         </div>
     )
 }
