@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-
-
 import oauthClient from '@/utils/auth/google_oauth';
 
 export async function GET(req: Request) {
@@ -16,7 +14,7 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: 'Authorization code not found' });
     }
 
-    //トークンに変更
+    // トークンに変更
     try {
         const { tokens } = await oauthClient.getToken(code);
         const response = NextResponse.redirect(new URL("/record", req.url))

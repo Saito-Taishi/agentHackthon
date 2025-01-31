@@ -15,10 +15,10 @@ export async function GET() {
 
   const authorizationUrl = oauthClient.generateAuthUrl({
     access_type: "offline",
+    prompt: 'consent',
     scope: SCOPES,
     state,
   });
-  console.log("認証URLは",authorizationUrl)
   // NextResponse.jsonを使用してJSONレスポンスを返す
   return NextResponse.json({ authorizationUrl });
 }

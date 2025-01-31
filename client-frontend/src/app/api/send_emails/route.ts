@@ -1,3 +1,5 @@
+// send_email/route.ts
+
 import oauthClient from "@/utils/auth/google_oauth"
 import { google } from "googleapis"
 import { cookies } from "next/headers"
@@ -7,7 +9,6 @@ import { cookies } from "next/headers"
 export async function POST(request: Request) {
     const cookieStore = await cookies()
     const accessToken = cookieStore.get("google_access_token")?.value
-
     if (!accessToken) {
         return new Response(JSON.stringify({ message: "No access token found" }), {
             status: 401,
@@ -17,14 +18,7 @@ export async function POST(request: Request) {
         });
     }
 
-    // スコープの確認のためにデバッグログを追加
-    try {
-        const tokenInfo = await oauthClient.getTokenInfo(accessToken);
-        console.log("Token Info:", tokenInfo);
-    } catch (error) {
-        console.error("Token Info Error:", error);
-    }
-
+    
     oauthClient.setCredentials({ access_token: accessToken })
 
     // Gmail Clientの初期化
