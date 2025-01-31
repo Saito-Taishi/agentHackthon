@@ -7,8 +7,10 @@ import RecordPageComponent from "./recordPageComponent";
 
 export default async function RecordPage() {
   // 1. Cookie からアクセストークンを取得
-  const cookieStore =await  cookies();
+  const cookieStore = await cookies();
   const accessToken = cookieStore.get("google_access_token")?.value;
+  const refreshToken = cookieStore.get("google_refresh_token")?.value;
+
 
   // 2. アクセストークンが無い場合 → 認可画面へリダイレクト
   if (!accessToken) {
@@ -19,15 +21,51 @@ export default async function RecordPage() {
   try {
     // これを呼び出すと無効または期限切れの場合にエラーが返ります
     await oauthClient.getTokenInfo(accessToken);
+  } catch {
+    console.log("アクセストークンの有効期限が切れていました。")
+    // リフレッシュトークンがあれば再取得を試みる
+    if (refreshToken) {
+      try {
+        // 明示的に refreshAccessToken() を呼び出す
+        const { credentials } = await oauthClient.refreshAccessToken();
+        // 新しいアクセストークンを Cookie に再セット
+        if (credentials.access_token) {
+          cookieStore.set("google_access_token", credentials.access_token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            path: "/",
+            maxAge: 60 * 60 * 24 * 7,
+          });
+        }
 
-  } catch (error) {
-    // invalid_token（期限切れ or リフレッシュ不可）等のエラーが出ます
-    console.error("Access token is invalid or expired:", error);
-    return await redirectToOAuth();
+        // もし新たにrefresh_tokenが返ってきたら、そちらも更新しておく
+        if (credentials.refresh_token) {
+          cookieStore.set("google_refresh_token", credentials.refresh_token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            path: "/",
+            maxAge: 60 * 60 * 24 * 7,
+          });
+        }
+
+        // oauthClient にも再度セット
+        oauthClient.setCredentials({
+          access_token: credentials.access_token,
+          refresh_token: credentials.refresh_token,
+        });
+      } catch (refreshError) {
+        console.error("Failed to refresh access token:", refreshError);
+        // リフレッシュに失敗 → ユーザーに再ログインしてもらう
+        return redirectToOAuth();
+      }
+    } else {
+      // リフレッシュトークンすら無い場合は再ログイン
+      return redirectToOAuth();
+    }
   }
 
   // 4. 有効な場合は後続の処理へ
-  oauthClient.setCredentials({ access_token: accessToken});
+  oauthClient.setCredentials({ access_token: accessToken });
 
   return (
     <>
