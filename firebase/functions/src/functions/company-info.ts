@@ -27,23 +27,20 @@ export const crawlCompanyInfo = async (
       extractedData
     );
 
-    if (companyOverviewUrl) {
-      // 会社概要ページの内容を取得
-      const overviewData = await scraper.scrapeCompanyOverview(
-        companyOverviewUrl
-      );
-      // 会社情報を解析
-      const companyInfo = await analyzer.analyzeCompanyOverview(overviewData);
-
+    if (!companyOverviewUrl) {
       return {
-        success: true,
-        data: companyInfo,
+        error: "会社概要ページのURLが見つかりませんでした",
       };
     }
+    // 会社概要ページの内容を取得
+    const overviewData = await scraper.scrapeCompanyOverview(
+      companyOverviewUrl
+    );
+    // 会社情報を解析
+    const companyInfo = await analyzer.analyzeCompanyOverview(overviewData);
 
     return {
-      success: true,
-      data: extractedData,
+      data: companyInfo,
     };
   } catch (error) {
     console.error("Error crawling company info:", error);

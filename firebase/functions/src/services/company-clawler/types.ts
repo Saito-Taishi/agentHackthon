@@ -22,8 +22,10 @@ export interface CompanyInfo {
   established?: string;
 }
 
-export interface ScrapingResult {
-  success: boolean;
-  data: ExtractedData | CompanyInfo;
-  error?: string;
-}
+export type ScrapingResult =
+  | {
+      data: ExtractedData | CompanyInfo;
+    }
+  | {
+      error: string;
+    };
