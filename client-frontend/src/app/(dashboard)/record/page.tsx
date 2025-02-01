@@ -8,45 +8,42 @@ export default async function RecordPage() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("google_access_token")?.value;
   const refreshToken = cookieStore.get("google_refresh_token")?.value;
+  console.log("refreshToken 保存:", refreshToken);
 
-  //リフレッシュトークンの確認
-  if (refreshToken){
-    console.log("リフレッシュは保存済み")
-  }
-
+  // アクセストークンが無い場合は OAuth の認可画面へリダイレクト
   if (!accessToken) {
     return await redirectToOAuth();
   }
-
   try {
+    // アクセストークンの有効性をチェック
     await oauthClient.getTokenInfo(accessToken);
   } catch {
-    console.log("アクセストークンの有効期限が切れていました。");
 
     if (refreshToken) {
-      // API Route でトークンをリフレッシュ
-      const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/refresh_token`, {
+      oauthClient.setCredentials({refresh_token:refreshToken})
+      // API Route を呼び出してアクセストークンをリフレッシュ
+      const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/refresh-token`, {
         method: "POST",
         cache: "no-store",
       });
 
       if (!res.ok) {
+        // リフレッシュに失敗した場合は再ログインを促す
         return redirectToOAuth();
       }
-      // リフレッシュに成功したら、再度 oauthClient に新しいアクセストークンをセット
+
       const data = await res.json();
       if (!data.success) {
         return redirectToOAuth();
       }
-      // ※ここでは Cookie の値はブラウザ側に反映されるため、
-      //    すぐには server-side の cookies() では新しい値が見えない可能性があります。
-      //    必要に応じて再リダイレクトなどの工夫が必要です。
+      // ※ Cookie はブラウザにセットされるため、サーバー側で直ちに新しい値を読み取れない可能性があります。
+      // 必要に応じてページの再リクエストやリダイレクト処理を検討してください。
     } else {
       return redirectToOAuth();
     }
   }
 
-  // 有効な場合は後続の処理へ
+  // 有効なアクセストークンを oauthClient にセット
   oauthClient.setCredentials({ access_token: accessToken });
 
   return (
