@@ -10,7 +10,7 @@ import {
     DrawerFooter,
     DrawerRoot,
 } from "@/components/ui/drawer"
-import type { EmailPayload, SelectedRecords } from "./useRecordHooks"
+import type { SelectedRecords } from "./useRecordHooks"
 
 
 
@@ -18,34 +18,17 @@ interface EmailDrawerProps {
     open: boolean
     setOpen: (open: boolean) => void
     selectedRecords: SelectedRecords[]
-    sendEmail: (emails: EmailPayload[]) => Promise<void>;
     emailSubject: string
     setEmailSubject: (subject: string) => void
 }
 
-export const EmailDrawer = ({ open, setOpen, selectedRecords, sendEmail, emailSubject, setEmailSubject }: EmailDrawerProps) => {
+export const EmailDrawer = ({ open, setOpen, selectedRecords, emailSubject, setEmailSubject }: EmailDrawerProps) => {
     const [emailDraft, setEmailDraft] = useState("")
     // プレースホルダーを管理するステート
     const [placeholders] = useState([
         { key: 'companyName', label: '会社名', placeholder: '{会社名}' },
         { key: 'personName', label: '氏名', placeholder: '{氏名}' },
     ]);
-
-
-    const handleSendEmail = async () => {
-        // For each record, build an object that includes id, to, subject, message
-        const emailsBody: EmailPayload[] = selectedRecords.map((record) => ({
-            id: record.id,
-            to: record.personEmail,
-            subject: emailSubject,
-            message: replacePlaceholders(emailDraft, record)
-        }));
-        console.log("メールの中身は",emailsBody)
-
-        await sendEmail(emailsBody);
-        setOpen(false);
-    };
-
 
     // プレースホルダーを実際の値に置換する関数
     const replacePlaceholders = (text: string, record: { personName: string, companyName: string }) => {
@@ -61,6 +44,14 @@ export const EmailDrawer = ({ open, setOpen, selectedRecords, sendEmail, emailSu
         setEmailDraft(prevBody => prevBody + placeholder);
     };
 
+    const copyTextToClipboard = async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            // Optionally add user feedback here, e.g., an alert or toast.
+        } catch (error) {
+            console.error("Failed to copy text", error);
+        }
+    };
 
     return (
         <DrawerRoot size={"lg"} open={open} onOpenChange={(e) => setOpen(e.open)}>
@@ -134,19 +125,33 @@ export const EmailDrawer = ({ open, setOpen, selectedRecords, sendEmail, emailSu
                             {/* プレビュー表示 */}
                             {emailDraft && (
                                 <div>
-                                    <div className="text-sm font-medium text-gray-700 mb-1">1件目のプレビュー:</div>
-                                    <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-200">
-                                        <p className="text-sm text-gray-800 whitespace-pre-line">{replacePlaceholders(emailDraft, selectedRecords[0])}</p>
-                                    </div>
+                                    {selectedRecords.map((record, index) => (
+                                        <div key={record.id} className="mb-4 flex gap-4">
+                                            <div className="flex-1">
+                                                <div className="text-sm font-medium text-gray-700 mb-1">
+                                                    {`${index + 1}件目のプレビュー: ${record.personEmail}`}
+                                                </div>
+                                                <div className="mt-2 p-3 bg-gray-50 rounded-md border border-gray-200">
+                                                    <p className="text-sm text-gray-800 whitespace-pre-line">
+                                                        {replacePlaceholders(emailDraft, record)}
+                                                    </p>
+                                                </div>
+                                                <div className="mt-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => copyTextToClipboard(replacePlaceholders(emailDraft, record))}
+                                                        className="px-2 py-1 text-xs font-medium text-white bg-indigo-500 rounded hover:bg-indigo-600"
+                                                    >
+                                                        コピー
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </div>
                     </div>
-
-                    <p className="text-sm text-gray-500">
-                        送信ボタンを押すと、上記メールアドレス宛に一斉送信されます。
-                        送信前に内容を再度ご確認ください。
-                    </p>
                 </DrawerBody>
                 <DrawerFooter>
                     <DrawerActionTrigger asChild>
@@ -158,14 +163,6 @@ export const EmailDrawer = ({ open, setOpen, selectedRecords, sendEmail, emailSu
                             キャンセル
                         </button>
                     </DrawerActionTrigger>
-                    <button
-                        type="button"
-                        className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-500 disabled:bg-indigo-300"
-                        onClick={handleSendEmail}
-                        disabled={!emailSubject.trim() || !emailDraft.trim()}
-                    >
-                        送信する
-                    </button>
                 </DrawerFooter>
                 <DrawerCloseTrigger />
             </DrawerContent>

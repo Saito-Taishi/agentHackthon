@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       const hrefSelectPrompt = await hub.pull("zenn_selected_href");
       const openaiChain = hrefSelectPrompt.pipe(openaiModel);
       const selectedHref = await openaiChain.invoke({ question: extractedData });
-      
+
       // selectedHrefの結果を使って新しいページに遷移
       if (selectedHref) {
         const { url } = selectedHref;

@@ -16,12 +16,6 @@ export type SelectedRecords = {
 	personName: string;
 };
 
-export interface EmailPayload {
-	id: string;
-	to: string;
-	subject: string;
-	message: string;
-}
 
 export function useRecordHooks() {
 	const [records, setRecords] = useState<BusinessCard[]>([]);
@@ -88,48 +82,6 @@ export function useRecordHooks() {
 		});
 	};
 
-	// メール送信
-	const handleSendEmail = async (emailsBody: EmailPayload[]) => {
-		console.log(emailsBody);
-
-		try {
-			// ダミーデータの作成
-			const emailsData: EmailPayload[] = [
-				{
-					id: "1",
-					to: "taishi.saito@onesteps.net",
-					subject: "テストメール1",
-					message: "これはテストメール1の本文です。",
-				},
-				{
-					id: "2",
-					to: "sai10tai41112@gmail.com",
-					subject: "テストメール2",
-					message: "これはテストメール2の本文です。",
-				},
-			];
-
-			const response = await fetch("/api/send_emails", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ emails: emailsData }),
-			});
-
-			const data = await response.json();
-
-			if (!response.ok) {
-				console.error("Error details:", data);
-				throw new Error(data.message || "Failed to send email");
-			}
-			console.log("Emails sent successfully:", data);
-			// 成功時のUI表示を追加
-		} catch (error) {
-			console.error("Error sending emails:", error);
-			// エラー時のUI表示を追加
-		}
-	};
 
 	return {
 		selectedRecords,
@@ -139,7 +91,6 @@ export function useRecordHooks() {
 		loading,
 		error,
 		handleCheckboxChange,
-		handleSendEmail,
 		emailSubject,
 		setEmailSubject,
 	};

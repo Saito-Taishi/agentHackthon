@@ -5,7 +5,7 @@ import { useRecordHooks } from "./useRecordHooks";
 import { EmailDrawer } from "./emailDrawer";
 
 export default function RecordPageComponent() {
-    const { records, handleCheckboxChange, selectedRecords, open, setOpen, handleSendEmail, emailSubject, setEmailSubject } = useRecordHooks();
+    const { records, handleCheckboxChange, selectedRecords, open, setOpen, emailSubject, setEmailSubject } = useRecordHooks();
     const hasSelectedRecords = selectedRecords.length > 0; // 選択されたレコードがあるかどうか
 
     return (
@@ -25,7 +25,7 @@ export default function RecordPageComponent() {
                             setOpen(true);
                         }}
                     >
-                        メール送信
+                        メール原稿を作成
                     </button>
                 </div>
             </div>
@@ -130,7 +130,6 @@ export default function RecordPageComponent() {
                 open={open}
                 setOpen={setOpen}
                 selectedRecords={selectedRecords}
-                sendEmail={handleSendEmail}
                 emailSubject={emailSubject}
                 setEmailSubject={setEmailSubject}
             />
