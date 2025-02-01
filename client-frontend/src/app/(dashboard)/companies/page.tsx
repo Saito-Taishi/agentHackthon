@@ -14,14 +14,18 @@ export default function CompaniesPage() {
     getEmployeesByCompanyId,
   } = useCompaniesHooks();
 
-  const selectedEmployees = selectedCompanyId ? getEmployeesByCompanyId(selectedCompanyId) : [];
+  const selectedEmployees = selectedCompanyId
+    ? getEmployeesByCompanyId(selectedCompanyId)
+    : [];
 
   return (
     <div className="mx-auto max-w-7xl">
       <div className="sm:flex sm:items-center mb-8">
         <div className="sm:flex-auto">
           <h1 className="text-2xl font-semibold text-gray-900">企業一覧</h1>
-          <p className="mt-2 text-sm text-gray-700">登録されている企業の一覧です</p>
+          <p className="mt-2 text-sm text-gray-700">
+            登録されている企業の一覧です
+          </p>
         </div>
       </div>
 
@@ -36,12 +40,12 @@ export default function CompaniesPage() {
                 >
                   会社名
                 </th>
-                <th
+                {/* <th
                   scope="col"
                   className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[100px]"
                 >
                   上場区分
-                </th>
+                </th> */}
                 <th
                   scope="col"
                   className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[100px]"
@@ -88,19 +92,22 @@ export default function CompaniesPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {companies.map((company) => (
-                <tr key={company.id} className="hover:bg-gray-50 transition-colors">
+                <tr
+                  key={company.id}
+                  className="hover:bg-gray-50 transition-colors"
+                >
                   <td className="py-4 pl-4 pr-3 text-sm sm:pl-6">
                     <button
                       className="font-semibold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
                       type="button"
                       onClick={() => {
-                        handleCompanyNameClick(company.companyName, company.id);
+                        handleCompanyNameClick(company.name, company.id);
                       }}
                     >
-                      {company.companyName}
+                      {company.name}
                     </button>
                   </td>
-                  <td className="px-3 py-4 text-sm text-gray-500">
+                  {/* <td className="px-3 py-4 text-sm text-gray-500">
                     <span
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                         company.IPO === "上場"
@@ -110,19 +117,29 @@ export default function CompaniesPage() {
                     >
                       {company.IPO}
                     </span>
+                  </td> */}
+                  <td className="px-3 py-4 text-sm text-gray-500">
+                    {company.employeeCount
+                      ? `${company.employeeCount}人`
+                      : "情報なし"}
                   </td>
                   <td className="px-3 py-4 text-sm text-gray-500">
-                    {company.employeeCount.toLocaleString()}
+                    {company.sales || "情報なし"}
                   </td>
-                  <td className="px-3 py-4 text-sm text-gray-500">{company.sales}</td>
-                  <td className="px-3 py-4 text-sm text-gray-500">{company.headOfficeAddress}</td>
-                  <td className="px-3 py-4 text-sm text-gray-500">{company.capital}</td>
-                  <td className="px-3 py-4 text-sm text-gray-500">{company.established}</td>
+                  <td className="px-3 py-4 text-sm text-gray-500">
+                    {company.headOfficeAddress}
+                  </td>
+                  <td className="px-3 py-4 text-sm text-gray-500">
+                    {company.capital || "情報なし"}
+                  </td>
+                  <td className="px-3 py-4 text-sm text-gray-500">
+                    {company.established}
+                  </td>
                   <td className="px-3 py-4 text-sm text-gray-500">
                     <div className="flex flex-wrap gap-1.5">
                       {company.businessActivities.map((business) => (
                         <span
-                          key={`${company.companyName}-${business}`}
+                          key={`${company}-${business}`}
                           className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10"
                         >
                           {business}
@@ -132,12 +149,12 @@ export default function CompaniesPage() {
                   </td>
                   <td className="px-3 py-4 text-sm">
                     <a
-                      href={company.url}
+                      href={`https://${company.domain}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 hover:underline"
                     >
-                      {company.url}
+                      {company.domain}
                     </a>
                   </td>
                 </tr>
@@ -171,7 +188,11 @@ export default function CompaniesPage() {
                   aria-label="閉じる"
                 >
                   <title>close</title>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -202,10 +223,17 @@ export default function CompaniesPage() {
                   >
                     <div className="flex items-start space-x-4 p-4">
                       <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Image src={"/next.svg"} width={500} height={500} alt="名刺" />
+                        <Image
+                          src={"/next.svg"}
+                          width={500}
+                          height={500}
+                          alt="名刺"
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-lg font-bold text-gray-900 mb-1">{employee.name}</h4>
+                        <h4 className="text-lg font-bold text-gray-900 mb-1">
+                          {employee.name}
+                        </h4>
                         <div className="space-y-2">
                           <p className="flex items-center text-sm text-gray-600">
                             <svg
