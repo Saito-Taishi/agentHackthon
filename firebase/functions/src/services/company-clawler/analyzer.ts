@@ -7,7 +7,7 @@ export class CompanyAnalyzer {
 
   constructor() {
     this.model = new ChatOpenAI({
-      model: "gpt-4",
+      model: "gpt-4o",
       temperature: 0.5,
     });
   }
@@ -20,7 +20,9 @@ export class CompanyAnalyzer {
       const hrefSelectPrompt = await hub.pull("zenn_selected_href");
       const openaiChain = hrefSelectPrompt.pipe(this.model);
       const result = await openaiChain.invoke({ question: data });
-      return result.url || null;
+      const { url } = result as unknown as { url: string };
+
+      return url;
     } catch (error) {
       console.error("Error finding company overview URL:", error);
       return null;
