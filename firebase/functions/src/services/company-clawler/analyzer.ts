@@ -13,6 +13,31 @@ export class CompanyAnalyzer {
   }
 
   /**
+   * 企業ドメインを抽出し正規化する
+   *
+   * @param url 企業のURL（例："https://www.example.com/page"）
+   * @returns 正規化されたドメイン（例："example.com"）、取得できなかった場合はnull
+   */
+  extractNormalizedDomain(url: string): string | null {
+    try {
+      const parsedUrl = new URL(url);
+      let domain = parsedUrl.hostname.replace("www.", "");
+
+      // サブドメイン処理: 必要に応じてカスタムルールを実装可能
+      // 例としてトップレベルドメインとセカンドレベルドメインのみを抽出
+      const parts = domain.split(".");
+      if (parts.length > 2) {
+        domain = parts.slice(parts.length - 2).join(".");
+      }
+
+      return domain;
+    } catch (error) {
+      console.error("Error extracting normalized domain:", error);
+      return null;
+    }
+  }
+
+  /**
    * 会社概要ページのURLを特定する
    */
   async findCompanyOverviewUrl(data: ExtractedData): Promise<string | null> {
