@@ -9,11 +9,10 @@ export interface ExtractedData {
   links: Link[];
 }
 
-export interface CompanyOverviewData {
-  text: string;
-}
-
-export interface CompanyInfo {
+export interface Company {
+  domain: string;
+  name: string;
+  overview: string;
   employeeCount?: string;
   sales?: string;
   businessActivities?: string[];
@@ -24,8 +23,10 @@ export interface CompanyInfo {
 
 export type ScrapingResult =
   | {
-      data: ExtractedData | CompanyInfo;
+      success: true;
+      company: Company;
     }
   | {
+      success: false;
       error: string;
     };

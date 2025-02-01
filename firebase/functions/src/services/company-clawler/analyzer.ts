@@ -1,6 +1,6 @@
 import { ChatOpenAI } from "@langchain/openai";
 import * as hub from "langchain/hub";
-import { ExtractedData, CompanyInfo, CompanyOverviewData } from "./types";
+import { ExtractedData, Company } from "./types";
 
 export class CompanyAnalyzer {
   private model: ChatOpenAI;
@@ -57,17 +57,15 @@ export class CompanyAnalyzer {
   /**
    * 会社概要ページから情報を抽出する
    */
-  async analyzeCompanyOverview(
-    data: CompanyOverviewData
-  ): Promise<CompanyInfo> {
+  async analyzeCompanyOverview(overview: string): Promise<Company> {
     try {
       const companyOverviewPrompt = await hub.pull("zenn_company_overview");
       const openaiChain = companyOverviewPrompt.pipe(this.model);
       const result = await openaiChain.invoke({
-        question: data,
+        question: overview,
       });
 
-      return result as CompanyInfo;
+      return result as unknown as Company;
     } catch (error) {
       console.error("Error analyzing company overview:", error);
       throw error;
