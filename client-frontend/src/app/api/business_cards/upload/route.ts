@@ -42,6 +42,14 @@ export async function POST(request: Request) {
     console.log("responseは以下のようになる。",response)
 
 
+    // companyName: 'リコーITソリューションズ株式会社',
+    // position: 'AIストラテジーセンター AIイノベーション室 ビジネスソリューショングループ',
+    // name: '佐官 雄介',
+    // mail: 'yusuke.sakan@jp.ricoh.com',
+    // phoneNumber: '080-7353-0079',
+    // companyAddress: '〒224-0035 神奈川県横浜市都筑区新栄町16-1',
+    // companyUrl: 'null'
+
     // 型チェックと変換
     const responseData = JSON.parse(JSON.stringify(response));
     if (!isCard(responseData)) {
@@ -52,9 +60,8 @@ export async function POST(request: Request) {
     const { id, data } = await createBusinessCard({
       personName: responseData.name,
       personEmail: responseData.mail,
-      personPosition: responseData.role,
       personPhoneNumber: responseData.phoneNumber,
-      role: responseData.role,
+      role: responseData.position,
       websiteURL: responseData.companyUrl,
       createdBy: user.uid,
       companyName: responseData.companyName,

@@ -7,7 +7,6 @@ export type BusinessCardData = {
   personName: string;
   personEmail: string;
   personPhoneNumber: string;
-  personPosition:string;
   createdBy: string | DocumentReference;
   companyName: string;
   // オプショナルフィールド
@@ -16,7 +15,7 @@ export type BusinessCardData = {
   websiteURL?: string;
   role?: string;
   companyAddress?: string;
-  memo?: string;
+  memo?: string;w
 
   // システムフィールド
   createdAt: Timestamp;
