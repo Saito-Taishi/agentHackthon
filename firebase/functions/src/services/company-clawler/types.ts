@@ -10,8 +10,8 @@ export interface ExtractedData {
 }
 
 export interface Company {
-  domain: string;
   name: string;
+  domain: string;
   overview: string;
   employeeCount?: string;
   sales?: string;
