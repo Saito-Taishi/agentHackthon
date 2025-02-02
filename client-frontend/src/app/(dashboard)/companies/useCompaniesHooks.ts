@@ -16,14 +16,6 @@ interface Company {
   established: string;
 }
 
-interface Employee {
-  id: string;
-  name: string;
-  affiliation: string; // 所属キー
-  position: string;
-  email: string;
-  companyID: string; // 所属会社ID
-}
 
 export function useCompaniesHooks() {
   // const companies: Company[] = [
