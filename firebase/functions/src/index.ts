@@ -5,6 +5,11 @@ import { auth } from "firebase-functions/v1";
 import { onRequest } from "firebase-functions/v2/https";
 import { crawlCompanyInfo } from "./functions/company-info";
 import { saveCompany } from "./services/company/db";
+import { setGlobalOptions } from "firebase-functions/v2";
+
+setGlobalOptions({
+  region: "asia-northeast1",
+});
 
 admin.initializeApp();
 
