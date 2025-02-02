@@ -5,6 +5,11 @@ import { auth } from "firebase-functions/v1";
 import { onRequest } from "firebase-functions/v2/https";
 import { crawlCompanyInfo } from "./functions/company-info";
 import { saveCompany } from "./services/company/db";
+import { setGlobalOptions } from "firebase-functions/v2";
+
+setGlobalOptions({
+  region: "asia-northeast1",
+});
 
 admin.initializeApp();
 
@@ -37,12 +42,17 @@ export const scrapeCompanyInfo = onDocumentCreated(
   async (event) => {
     const snapshot = event.data?.data();
     if (!snapshot) {
-      // TODO error handling
+      console.error("No data in snapshot");
       return;
     }
 
-    const companyInfo = await crawlCompanyInfo(snapshot.url);
-    await firestore.collection("companies").add(companyInfo);
+    const crawlResult = await crawlCompanyInfo(snapshot.websiteURL);
+    if (!crawlResult.success) {
+      console.error("Error crawling company info:", crawlResult.error);
+      return;
+    }
+
+    await saveCompany(crawlResult.company);
   }
 );
 

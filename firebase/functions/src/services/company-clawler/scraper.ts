@@ -45,7 +45,7 @@ export class CompanyScraper {
     };
   }
 
-  async scrapeCompanyOverview(url: string): Promise<string> {
+  async scrapeDom(url: string): Promise<string> {
     if (!this.page) {
       throw new Error("Browser not initialized");
     }

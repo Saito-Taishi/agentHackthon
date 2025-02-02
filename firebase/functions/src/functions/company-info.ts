@@ -40,18 +40,15 @@ export const crawlCompanyInfo = async (
         error: "会社概要ページのURLが見つかりませんでした",
       };
     }
-    // 会社概要ページの内容を取得
-    const overview = await scraper.scrapeCompanyOverview(companyOverviewUrl);
-    // 会社情報を解析
-    const companyInfo = await analyzer.analyzeCompanyOverview(overview);
+
+    const dom = await scraper.scrapeDom(companyOverviewUrl);
+    const companyInfo = await analyzer.analyzeCompanyOverview(dom);
 
     console.log("companyInfo", companyInfo);
 
     const company: Company = {
       ...companyInfo,
-      name: "名前はまだ取得できません株式会社",
       domain: domain,
-      overview: overview,
     };
 
     return {
