@@ -37,12 +37,17 @@ export const scrapeCompanyInfo = onDocumentCreated(
   async (event) => {
     const snapshot = event.data?.data();
     if (!snapshot) {
-      // TODO error handling
+      console.error("No data in snapshot");
       return;
     }
 
-    const companyInfo = await crawlCompanyInfo(snapshot.url);
-    await firestore.collection("companies").add(companyInfo);
+    const crawlResult = await crawlCompanyInfo(snapshot.websiteURL);
+    if (!crawlResult.success) {
+      console.error("Error crawling company info:", crawlResult.error);
+      return;
+    }
+
+    await saveCompany(crawlResult.company);
   }
 );
 
