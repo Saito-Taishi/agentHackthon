@@ -65,8 +65,6 @@ export class CompanyAnalyzer {
       const formatInstructions = `
       JSON形式で回答するようにしてください。
       レスポンスのJSONの型は
-      {{
-        companyOverview:
           {{
             employeeCount:"string", 
             sales:"string", 
@@ -75,7 +73,7 @@ export class CompanyAnalyzer {
             capital:"string",
             established:"string",
           }}
-      }}`
+`
 			const SystemMessage = `htmlから抽出した文章データを受け取ります。
       以下のルールを守り、以下のデータを抽出してください。
       もしもなければnullにしてください。
