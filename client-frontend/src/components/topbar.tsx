@@ -8,10 +8,9 @@ export function Topbar() {
 
   // Return active style if the current path starts with the provided link
   const linkClass = (href: string) =>
-    `px-4 py-2 rounded-lg ${
-      pathname?.startsWith(href)
-        ? "bg-blue-500 text-white"
-        : "hover:bg-gray-200 dark:hover:bg-gray-800"
+    `px-4 py-2 rounded-lg ${pathname?.startsWith(href)
+      ? "bg-blue-500 text-white"
+      : "hover:bg-gray-200 dark:hover:bg-gray-800"
     }`;
 
   return (
