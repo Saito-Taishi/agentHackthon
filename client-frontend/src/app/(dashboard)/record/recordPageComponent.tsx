@@ -64,6 +64,9 @@ export default function RecordPageComponent() {
                                     ステータス
                                 </th>
                                 <th scope="col" className="px-3 py-4 text-left text-sm font-semibold text-gray-900">
+                                    優先度
+                                </th>
+                                <th scope="col" className="px-3 py-4 text-left text-sm font-semibold text-gray-900">
                                     アップロード日時
                                 </th>
                             </tr>
@@ -116,6 +119,9 @@ export default function RecordPageComponent() {
                                         >
                                             {record.status ? "完了" : "未処理"}
                                         </span>
+                                    </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                        {record.priority || "中"}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                         {record.createdAt?.toDate().toLocaleString()}
