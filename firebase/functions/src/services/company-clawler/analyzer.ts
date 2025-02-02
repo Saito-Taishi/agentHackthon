@@ -68,10 +68,10 @@ export class CompanyAnalyzer {
           {{
             employeeCount:"string", 
             sales:"string", 
-            businessActivities:"string",
             headOfficeAddress:"string",
             capital:"string",
             established:"string",
+            businessActivities:"string[]",
           }}
 `
 			const SystemMessage = `htmlから抽出した文章データを受け取ります。
