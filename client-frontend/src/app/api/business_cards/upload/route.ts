@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
     // AI処理
     const geminiModel = new ChatGoogleGenerativeAI({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.0-flash-exp",
       temperature: 0,
     });
 
@@ -39,6 +39,8 @@ export async function POST(request: Request) {
     const openaiModel = new ChatOpenAI({ model: "gpt-4o-mini", temperature: 0 });
     const openaiChain = textToJsonPrompt.pipe(openaiModel);
     const response = await openaiChain.invoke({ text: cardInfo });
+    console.log("responseは以下のようになる。",response)
+
 
     // 型チェックと変換
     const responseData = JSON.parse(JSON.stringify(response));
@@ -50,6 +52,7 @@ export async function POST(request: Request) {
     const { id, data } = await createBusinessCard({
       personName: responseData.name,
       personEmail: responseData.mail,
+      personPosition: responseData.role,
       personPhoneNumber: responseData.phoneNumber,
       role: responseData.role,
       websiteURL: responseData.companyUrl,

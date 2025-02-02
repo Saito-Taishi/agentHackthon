@@ -7,6 +7,7 @@ export type BusinessCardData = {
   personName: string;
   personEmail: string;
   personPhoneNumber: string;
+  personPosition:string;
   createdBy: string | DocumentReference;
   companyName: string;
   // オプショナルフィールド
