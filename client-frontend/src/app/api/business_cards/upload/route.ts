@@ -16,14 +16,21 @@ type UploadResponse = APISuccessResponse<BusinessCardData> & {
 };
 
 export async function POST(request: Request) {
-  console.log("ファイルが呼び出される")
   try {
     // セッションの検証とユーザー情報の取得
     const user = await validateSession();
-    const arrayBuffer = await request.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer)
-    const base64 = buffer.toString("base64")
-    const imageUrl = `data:image/png;base64,${base64}`;
+
+    const formData = await request.formData();
+    const file = formData.get("file") as File | null;
+
+    if (!file) {
+      return createErrorResponse("ファイルがアップロードされていません", "NO_FILE_UPLOADED", 400);
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const base64 = Buffer.from(arrayBuffer).toString("base64");
+    const mimeType = file.type;
+    const imageUrl = `data:${mimeType};base64,${base64}`;
 
     // AI処理
     const geminiModel = new ChatGoogleGenerativeAI({

@@ -4,94 +4,64 @@ import { db } from "@/utils/config/firebase";
 import type { BusinessCardData } from "@/utils/db/business-card";
 
 interface BusinessCard extends BusinessCardData {
-	id: string;
-	status: boolean;
-	imageUrl: string;
+  id: string;
+  status: boolean;
+  imageUrl: string;
 }
 
-export type SelectedRecords = {
-	id: string;
-	companyName: string;
-	personEmail: string;
-	personName: string;
-};
-
-
 export function useRecordHooks() {
-	const [records, setRecords] = useState<BusinessCard[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-	const [selectedRecords, setSelectedRecords] = useState<SelectedRecords[]>([]);
-	const [emailSubject, setEmailSubject] = useState<string>("");
-	const [open, setOpen] = useState<boolean>(false); // EmailDrawerの表示ロジック
+  const [records, setRecords] = useState<BusinessCard[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedRecords, setSelectedRecords] = useState<string[]>([]);
 
-	useEffect(() => {
-		const businessCardsRef = collection(db, "business_cards");
-		const q = query(businessCardsRef, orderBy("createdAt", "desc"));
+  console.log("records", records);
 
-		const unsubscribe = onSnapshot(
-			q,
-			(snapshot) => {
-				const businessCards = snapshot.docs.map((doc) => {
-					const data = doc.data() as BusinessCardData;
-					return {
-						...data,
-						id: doc.id,
-						imageUrl: "https://via.placeholder.com/150", // TODO: 実際の画像URLを設定
-						status: false, // TODO: ステータスの管理方法を検討
-					};
-				});
-				setRecords(businessCards);
-				setLoading(false);
-				setError(null);
-			},
-			(err) => {
-				console.error("Error fetching business cards:", err);
-				setError("名刺データの取得中にエラーが発生しました");
-				setLoading(false);
-			},
-		);
+  useEffect(() => {
+    const businessCardsRef = collection(db, "business_cards");
+    const q = query(businessCardsRef, orderBy("createdAt", "desc"));
 
-		// クリーンアップ関数でリスナーを解除
-		return () => unsubscribe();
-	}, []);
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const businessCards = snapshot.docs.map((doc) => {
+          const data = doc.data() as BusinessCardData;
+          return {
+            ...data,
+            id: doc.id,
+            imageUrl: "https://via.placeholder.com/150", // TODO: 実際の画像URLを設定
+            status: false, // TODO: ステータスの管理方法を検討
+          };
+        });
+        setRecords(businessCards);
+        setLoading(false);
+        setError(null);
+      },
+      (err) => {
+        console.error("Error fetching business cards:", err);
+        setError("名刺データの取得中にエラーが発生しました");
+        setLoading(false);
+      },
+    );
 
-	const handleCheckboxChange = (recordId: string, record: SelectedRecords) => {
-		setSelectedRecords((prevSelectedRecords) => {
-			const alreadySelected = prevSelectedRecords.some(
-				(selectedRecord) => selectedRecord.id === recordId,
-			);
+    // クリーンアップ関数でリスナーを解除
+    return () => unsubscribe();
+  }, []);
 
-			if (alreadySelected) {
-				// チェック解除: 該当レコードを削除
-				return prevSelectedRecords.filter(
-					(selectedRecord) => selectedRecord.id !== recordId,
-				);
-			}
+  const handleCheckboxChange = (id: string) => {
+    setSelectedRecords((prevSelected) => {
+      if (prevSelected.includes(id)) {
+        return prevSelected.filter((recordId) => recordId !== id);
+      }
+      return [...prevSelected, id];
+    });
+  };
 
-			// チェック: 新しいレコード情報を追加 (else ブロックを削除)
-			return [
-				...prevSelectedRecords,
-				{
-					id: recordId,
-					companyName: record.companyName,
-					personName: record.personName,
-					personEmail: record.personEmail,
-				},
-			];
-		});
-	};
-
-
-	return {
-		selectedRecords,
-		open,
-		setOpen,
-		records,
-		loading,
-		error,
-		handleCheckboxChange,
-		emailSubject,
-		setEmailSubject,
-	};
+  return {
+    selectedRecords,
+    records,
+    loading,
+    error,
+    handleCheckboxChange,
+  };
 }

@@ -8,106 +8,146 @@ import type { APIResponse } from "@/utils/api/response";
 type UploadResponse = APIResponse<Card>;
 
 export function useImageUpload() {
-	const [selectedFiles, setSelectedFiles] = useState<Blob[]>([]);
-	const [selectedImages, setSelectedImages] = useState<string[]>([]);
-	const [isLoading, setIsLoading] = useState(false);
-	// const [uploadProgress, setUploadProgress] = useState(0);
-	// const [uploadResults, setUploadResults] = useState<UploadResponse[]>([]);
-	const [error, setError] = useState<string | null>(null);
-	const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadResults, setUploadResults] = useState<UploadResponse[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-	const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (e.target.files && e.target.files.length > 0) {
-			const newImageUrls: string[] = [];
-			const newFiles: Blob[] = [];
-			const file = e.target.files[0];
-			const isHeic =
-				file.type.includes("heic") ||
-				file.type.includes("heif") ||
-				file.name.toLowerCase().endsWith(".heic") ||
-				file.name.toLowerCase().endsWith(".heif");
-			if (isHeic) {
-				try {
-					const convertedBlob = await heic2any({
-						blob: file,
-						toType: "image/png",
-					});
-					newFiles.push(convertedBlob as Blob);
-					setSelectedFiles((prev) => [...prev, ...newFiles]);
-					const convertedURL = URL.createObjectURL(convertedBlob as Blob);
-					newImageUrls.push(convertedURL);
-				} catch {
-					return console.log("");
-				}
-			} else {
-				const imageUrl = URL.createObjectURL(file);
-				newFiles.push(file as Blob);
-				setSelectedFiles((prev) => [...prev, ...newFiles]);
-				newImageUrls.push(imageUrl);
-			}
-			setSelectedImages((prevImages) => [...prevImages, ...newImageUrls]);
-		}
-	};
+  // ----
+  // HEICなどを含むファイル選択に対応するため、非同期関数に変更
+  // ----
+  const handleImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
-	const handleRemoveImage = (indexToRemove: number) => {
-		setSelectedFiles((prevFiles) =>
-			prevFiles.filter((_, index) => index !== indexToRemove),
-		);
-		setSelectedImages((prevImages) =>
-			prevImages.filter((_, index) => index !== indexToRemove),
-		);
-	};
+    const newImageUrls: string[] = [];
 
-	//名刺をスキャン
-	const handleSubmit = async () => {
-		if (selectedImages.length === 0) {
-			setError("画像が選択されていません");
-			return;
-		}
-		setIsLoading(true);
-		setError(null);
-		setSuccessMessage(null);
-		try {
-			const results: UploadResponse[] = [];
-			console.log("selectedFileの数は", selectedFiles.length);
-			for (const file of selectedFiles) {
-				console.log("呼び出し");
-				const response = await fetch("/api/business_cards/upload", {
-					method: "POST",
-					body: file,
-					credentials: "include",
-				});
+    // ファイルを1枚ずつ確認しながらプレビュー用URLを作成
+    for (const file of Array.from(files)) {
+      const isHeic =
+        file.type.includes("heic") ||
+        file.type.includes("heif") ||
+        file.name.toLowerCase().endsWith(".heic") ||
+        file.name.toLowerCase().endsWith(".heif");
 
-				const data = (await response.json()) as UploadResponse;
-				if (!response.ok || !data.success) {
-					throw new Error(data.message || "アップロードに失敗しました");
-				}
-				results.push(data);
-			}
-			console.log("アップロード結果:", results);
+      if (isHeic) {
+        try {
+          const convertedBlob = await heic2any({
+            blob: file,
+            toType: "image/png",
+          });
+          const convertedURL = URL.createObjectURL(convertedBlob as Blob);
+          newImageUrls.push(convertedURL);
+        } catch (err) {
+          console.error("HEIC→JPEG変換中にエラー:", err);
+          setError("HEICファイルの変換に失敗しました");
+        }
+      } else {
+        // 通常の画像の場合はそのままURL化
+        if (file.type.startsWith("image/")) {
+          const imageUrl = URL.createObjectURL(file);
+          newImageUrls.push(imageUrl);
+        }
+      }
+    }
+    setSelectedImages((prevImages) => [...prevImages, ...newImageUrls]);
+    setError(null);
+  };
 
-			setSuccessMessage("名刺の登録が完了しました");
+  const handleRemoveImage = (indexToRemove: number) => {
+    setSelectedImages((prevImages) => prevImages.filter((_, index) => index !== indexToRemove));
+  };
 
-			setSelectedImages([]);
-			setSelectedFiles([]);
-			setIsLoading(false);
-		} catch (error: unknown) {
-			console.error("画像アップロードエラー:", error);
-			setError(
-				error instanceof Error
-					? error.message
-					: "アップロード中にエラーが発生しました。",
-			);
-		}
-	};
+  const handleSubmit = async () => {
+    if (selectedImages.length === 0) {
+      setError("画像が選択されていません");
+      return;
+    }
 
-	return {
-		isLoading,
-		selectedImages,
-		error,
-		successMessage,
-		handleImageSelect,
-		handleRemoveImage,
-		handleSubmit,
-	};
+    setIsLoading(true);
+    setUploadProgress(0);
+    setError(null);
+
+    try {
+      const fileInput = document.getElementById("image-upload") as HTMLInputElement;
+      const files = fileInput.files;
+
+      if (!files) {
+        throw new Error("ファイルが選択されていません");
+      }
+
+      const totalFiles = files.length;
+      let completedFiles = 0;
+
+      // 各画像に対して個別にAPIリクエストを送信
+      const uploadPromises = Array.from(files).map(async (file) => {
+        const formData = new FormData();
+
+        // HEICファイルの場合はPNGに変換
+        const isHeic =
+          file.type.includes("heic") ||
+          file.type.includes("heif") ||
+          file.name.toLowerCase().endsWith(".heic") ||
+          file.name.toLowerCase().endsWith(".heif");
+
+        if (isHeic) {
+          try {
+            const convertedBlob = await heic2any({
+              blob: file,
+              toType: "image/png",
+            });
+            formData.append("file", convertedBlob as Blob, file.name.replace(/\.heic$/i, ".png"));
+          } catch (err) {
+            console.error("HEIC→PNG変換中にエラー:", err);
+            throw new Error("HEICファイルの変換に失敗しました");
+          }
+        } else {
+          formData.append("file", file);
+        }
+
+        const response = await fetch("/api/business_cards/upload", {
+          method: "POST",
+          body: formData,
+          credentials: "include", // セッションCookieを送信するために必要
+        });
+
+        const data = (await response.json()) as UploadResponse;
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "アップロードに失敗しました");
+        }
+
+        completedFiles++;
+        setUploadProgress(Math.round((completedFiles / totalFiles) * 100));
+
+        return data;
+      });
+
+      // すべてのアップロードを待機
+      const results = await Promise.all(uploadPromises);
+      setUploadResults(results);
+      console.log("アップロード結果:", results);
+
+      // アップロード完了後に画像選択をクリア
+      setSelectedImages([]);
+      setUploadProgress(0);
+    } catch (error: unknown) {
+      console.error("画像アップロードエラー:", error);
+      setError(error instanceof Error ? error.message : "アップロード中にエラーが発生しました");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    selectedImages,
+    isLoading,
+    uploadProgress,
+    uploadResults,
+    error,
+    handleImageSelect,
+    handleRemoveImage,
+    handleSubmit,
+  };
 }
