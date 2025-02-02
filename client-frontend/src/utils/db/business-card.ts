@@ -15,7 +15,7 @@ export type BusinessCardData = {
   websiteURL?: string;
   role?: string;
   companyAddress?: string;
-  memo?: string;w
+  memo?: string;
 
   // システムフィールド
   createdAt: Timestamp;
