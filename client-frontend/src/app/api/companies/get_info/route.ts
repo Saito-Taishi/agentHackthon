@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
       // selectedHrefの結果を使って新しいページに遷移
       if (selectedHref) {
-        const { url } = selectedHref;
+        const { url } = selectedHref as unknown as { url: string }
         await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
         const companyOverviewData = await page.evaluate(() => {
           return {

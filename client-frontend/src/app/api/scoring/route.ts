@@ -18,6 +18,9 @@ export async function POST(request:Request){
             // employeeCount:employeeCount,
             // sales:sales
         })
+
+        //低、中、高でレスポンス
+        console.log(res)
     }catch{
 
     }

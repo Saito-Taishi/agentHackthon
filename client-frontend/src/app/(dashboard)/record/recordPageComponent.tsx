@@ -121,7 +121,8 @@ export default function RecordPageComponent() {
                                         </span>
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">
-                                        {record.priority || "中"}
+                                        {/* {record.priority} */}
+                                        中
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                         {record.createdAt?.toDate().toLocaleString()}
