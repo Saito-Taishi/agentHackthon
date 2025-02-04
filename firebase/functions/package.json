@@ -16,6 +16,7 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "@google-cloud/functions-framework": "^3.4.5",
     "@langchain/core": "^0.3.32",
     "@langchain/google-genai": "^0.1.6",
     "@langchain/google-vertexai": "^0.1.8",

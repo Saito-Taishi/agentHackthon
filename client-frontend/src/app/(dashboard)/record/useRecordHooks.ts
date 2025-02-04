@@ -1,7 +1,13 @@
-import { useState, useEffect } from "react";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { auth, db } from "@/utils/config/firebase";
 import type { BusinessCardData } from "@/utils/db/business-card";
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
+import { useEffect, useState } from "react";
 
 interface BusinessCard extends BusinessCardData {
   id: string;
@@ -23,11 +29,17 @@ export function useRecordHooks() {
   const [selectedRecords, setSelectedRecords] = useState<SelectedRecords[]>([]);
   const [emailSubject, setEmailSubject] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false); // EmailDrawerの表示ロジック
+  const user = auth.currentUser;
 
   useEffect(() => {
-    if (!auth.currentUser) return;
+    if (!user) return;
+
     const businessCardsRef = collection(db, "business_cards");
-    const q = query(businessCardsRef, orderBy("createdAt", "desc"));
+    const q = query(
+      businessCardsRef,
+      where("createdBy", "==", user.uid),
+      orderBy("createdAt", "desc")
+    );
 
     const unsubscribe = onSnapshot(
       q,
@@ -54,7 +66,7 @@ export function useRecordHooks() {
 
     // クリーンアップ関数でリスナーを解除
     return () => unsubscribe();
-  }, []);
+  }, [user]);
 
   const handleCheckboxChange = (recordId: string, record: SelectedRecords) => {
     setSelectedRecords((prevSelectedRecords) => {
