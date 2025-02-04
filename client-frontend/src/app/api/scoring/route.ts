@@ -29,7 +29,7 @@ export async function POST(request:Request){
         const jsonRes = await openaiChain.invoke({
             scoringRes:scoringRes
         })
-        //低、中、高でレスポンス
+        //low, mid, high, unknownと出力
         console.log(jsonRes)
     }catch{
 
