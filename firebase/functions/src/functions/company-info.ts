@@ -1,7 +1,7 @@
 import { HttpsError } from "firebase-functions/v2/https";
 import { CompanyAnalyzer } from "../services/company-clawler/analyzer";
 import { CompanyScraper } from "../services/company-clawler/scraper";
-import { Company, ScrapingResult } from "../services/company-clawler/types";
+import { Company, ScrapingResult } from "../types";
 
 /**
  * 会社情報をウェブサイトから取得する

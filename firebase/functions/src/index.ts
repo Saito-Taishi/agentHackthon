@@ -1,11 +1,13 @@
 import * as admin from "firebase-admin";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { auth } from "firebase-functions/v1";
-import { onRequest } from "firebase-functions/v2/https";
-import { onDocumentCreated } from "firebase-functions/v2/firestore";
-import { crawlCompanyInfo } from "./functions/company-info";
-import { saveCompany } from "./services/company/db";
 import { setGlobalOptions } from "firebase-functions/v2";
+import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import { onRequest } from "firebase-functions/v2/https";
+import { crawlCompanyInfo } from "./functions/company-info";
+import { linkBusinessCard, updateScore } from "./services/business-card/db";
+import { saveCompany } from "./services/company/db";
+import { scoreCompany } from "./services/company-scoring/score";
 
 setGlobalOptions({
   region: "asia-northeast1",
@@ -41,19 +43,33 @@ export const createUserDocument = auth
 export const scrapeCompanyInfo = onDocumentCreated(
   "business_cards/{id}",
   async (event) => {
-    const snapshot = event.data?.data();
-    if (!snapshot || !snapshot.websiteURL) {
-      console.error("No data in snapshot or websiteURL is missing");
-      return;
+    if (!event.data) {
+      throw new Error("No data in event");
+    }
+    const businessCard = event.data?.data();
+    if (!businessCard || !businessCard.websiteURL) {
+      throw new Error("No data in snapshot or websiteURL is missing");
     }
 
-    const crawlResult = await crawlCompanyInfo(snapshot.websiteURL);
+    const crawlResult = await crawlCompanyInfo(businessCard.websiteURL);
     if (!crawlResult.success) {
-      console.error("Error crawling company info:", crawlResult.error);
-      return;
+      throw new Error("Error crawling company info: " + crawlResult.error);
+    }
+    const { company } = crawlResult;
+    const companyRef = await saveCompany(company);
+    if (!companyRef) {
+      throw new Error("Error saving company info");
     }
 
-    await saveCompany(crawlResult.company);
+    await linkBusinessCard(event.params.id, companyRef);
+
+    // TODO 会社のスコアを計算して名刺テーブルに保存する
+    if (!businessCard.role || !company.employeeCount) {
+      throw new Error("スコア計算に必要な情報が名刺に足りません");
+    }
+
+    const score = scoreCompany(businessCard.role, company.employeeCount);
+    await updateScore(event.params.id, score);
   }
 );
 
