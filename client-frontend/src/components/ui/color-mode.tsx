@@ -6,18 +6,16 @@ import { ThemeProvider, useTheme } from "next-themes";
 import type { ThemeProviderProps } from "next-themes";
 import * as React from "react";
 import { LuMoon, LuSun } from "react-icons/lu";
-
-
-export function ColorModeProvider(props: ThemeProviderProps) {
-  return <ThemeProvider attribute="class" disableTransitionOnChange {...props} />;
-}
-
 export type ColorMode = "light" | "dark";
 
 export interface UseColorModeReturn {
   colorMode: ColorMode;
   setColorMode: (colorMode: ColorMode) => void;
   toggleColorMode: () => void;
+}
+
+export function ColorModeProvider(props: ThemeProviderProps) {
+  return <ThemeProvider attribute="class" disableTransitionOnChange {...props} />;
 }
 
 export function useColorMode(): UseColorModeReturn {
@@ -41,6 +39,8 @@ export function ColorModeIcon() {
   const { colorMode } = useColorMode();
   return colorMode === "dark" ? <LuMoon /> : <LuSun />;
 }
+
+
 
 export const ColorModeButton = React.forwardRef<HTMLButtonElement, Omit<IconButtonProps, "aria-label">>(
   function ColorModeButton(props, ref) {
