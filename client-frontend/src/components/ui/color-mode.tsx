@@ -6,7 +6,6 @@ import { ThemeProvider, useTheme } from "next-themes";
 import type { ThemeProviderProps } from "next-themes";
 import * as React from "react";
 import { LuMoon, LuSun } from "react-icons/lu";
-
 export type ColorMode = "light" | "dark";
 
 export interface UseColorModeReturn {

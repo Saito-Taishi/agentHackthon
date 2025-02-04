@@ -125,7 +125,7 @@ export default function UploadPage() {
               />
             </svg>
             <span className="text-gray-500 dark:text-gray-400">
-              クリックして画像を選択（HEICも可）
+              クリックして画像を選択
             </span>
           </div>
           <input
@@ -133,6 +133,7 @@ export default function UploadPage() {
             type="file"
             className="hidden"
             accept="image/*,.heic,.HEIC"
+            multiple
             onChange={handleImageSelect}
           />
         </label>
