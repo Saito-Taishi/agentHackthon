@@ -17,9 +17,9 @@ interface BusinessCard extends BusinessCardData {
 
 export type SelectedRecords = {
   id: string;
-  companyName: string;
-  personEmail: string;
-  personName: string;
+  companyName: string|null;
+  personEmail: string|null;
+  personName: string|null;
 };
 
 export function useRecordHooks() {
