@@ -111,7 +111,9 @@ export default function RecordPageComponent() {
                                             {record.personEmail || "N/A"}
                                         </a>
                                     </td>
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm">{record.personPhoneNumber}</td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                        {record.personPhoneNumber}
+                                    </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">
                                         <span
                                             className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${record.status ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
