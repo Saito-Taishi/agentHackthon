@@ -3,7 +3,7 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatOpenAI } from "@langchain/openai";
 
 const COMPANY_SCORE = ["high", "mid", "low", "unknown"] as const;
-type CompanyScore = (typeof COMPANY_SCORE)[number];
+export type CompanyScore = (typeof COMPANY_SCORE)[number];
 
 export async function scoreCompany(
   role: string,

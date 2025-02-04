@@ -63,12 +63,18 @@ export const scrapeCompanyInfo = onDocumentCreated(
 
     await linkBusinessCard(event.params.id, companyRef);
 
-    // TODO 会社のスコアを計算して名刺テーブルに保存する
-    if (!businessCard.role || !company.employeeCount) {
+    if (
+      !businessCard.role ||
+      !company.employeeCount ||
+      !parseInt(company.employeeCount)
+    ) {
       throw new Error("スコア計算に必要な情報が名刺に足りません");
     }
 
-    const score = scoreCompany(businessCard.role, company.employeeCount);
+    const score = await scoreCompany(
+      businessCard.role,
+      Number(company.employeeCount)
+    );
     await updateScore(event.params.id, score);
   }
 );

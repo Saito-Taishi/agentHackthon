@@ -3,6 +3,7 @@ import {
   FieldValue,
   getFirestore,
 } from "firebase-admin/firestore";
+import { CompanyScore } from "../company-scoring/score";
 
 const COLLECTION_NAME = "business_cards";
 export async function linkBusinessCard(
@@ -28,7 +29,10 @@ export async function linkBusinessCard(
   }
 }
 
-export async function updateScore(id: string, score: string): Promise<void> {
+export async function updateScore(
+  id: string,
+  companyScore: CompanyScore
+): Promise<void> {
   const firestore = getFirestore();
   const businessCardRef = firestore.collection(COLLECTION_NAME).doc(id);
   const businessCardSnap = await businessCardRef.get();
@@ -37,7 +41,7 @@ export async function updateScore(id: string, score: string): Promise<void> {
   }
 
   await businessCardRef.update({
-    score: score,
+    companyScore,
     updatedAt: FieldValue.serverTimestamp(),
   });
 }
