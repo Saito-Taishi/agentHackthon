@@ -6,7 +6,7 @@ export async function POST(request:Request){
     try{
         const body = await request.json()
         //役職、従業員数、売上、事業内容
-        const {role} = body;
+        const {role, employeeCount} = body;
         const model = new ChatGoogleGenerativeAI({
             model:"gemini-2.0-flash-exp",
             temperature:0
@@ -14,8 +14,8 @@ export async function POST(request:Request){
         const prompt = await hub.pull("zenn_ai_agent_scoring")
         const geminiChain = prompt.pipe(model)
         const res = await geminiChain.invoke({
-            role:role
-            // employeeCount:employeeCount,
+            role:role,
+            employeeCount:employeeCount,
             // sales:sales
         })
 
