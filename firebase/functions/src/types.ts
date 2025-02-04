@@ -30,5 +30,3 @@ export type ScrapingResult =
       success: false;
       error: string;
     };
-
-export type BusinessCards = {};
