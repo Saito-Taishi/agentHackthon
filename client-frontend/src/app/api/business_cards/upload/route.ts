@@ -18,6 +18,28 @@ type UploadResponse = APISuccessResponse<BusinessCardData> & {
 	documentId: string;
 };
 
+// Helper function to recursively convert any property equal to "null" (string) to the actual null value
+function convertStringNulls(obj: unknown): unknown {
+	if (typeof obj === "string") {
+		return obj.trim() === "null" ? null : obj;
+	}
+	if (Array.isArray(obj)) {
+		return obj.map((item) => convertStringNulls(item));
+	}
+	if (obj !== null && typeof obj === "object") {
+		const newObj: Record<string, unknown> = {
+			...(obj as Record<string, unknown>),
+		};
+		for (const key in newObj) {
+			if (Object.prototype.hasOwnProperty.call(newObj, key)) {
+				newObj[key] = convertStringNulls(newObj[key]);
+			}
+		}
+		return newObj;
+	}
+	return obj;
+}
+
 export async function POST(request: Request) {
 	console.log("ファイルが呼び出される");
 	try {
@@ -67,12 +89,18 @@ export async function POST(request: Request) {
 				model: "gpt-4o-mini",
 				temperature: 0,
 			});
+
 			const openaiChain = textToJsonPrompt.pipe(openaiModel);
 			const response = await openaiChain.invoke({ text: cardInfo });
-			console.log("responseは以下のようになる。", response);
 
-			// 型チェックと変換
-			const responseData = JSON.parse(JSON.stringify(response));
+			// 型チェックと変換:
+			// 1. Parse the response if it's a string (JSON.parse will return null if the string is "null").
+			// 2. Recursively convert any nested property values that equal "null" (as a string) to the actual null.
+			const responseParsed =
+				typeof response === "string" ? JSON.parse(response) : response;
+			const responseData = convertStringNulls(responseParsed);
+
+			console.log("responseは以下のようになる。", responseData);
 			if (!isCard(responseData)) {
 				return createErrorResponse(
 					"名刺情報の形式が正しくありません",

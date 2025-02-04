@@ -4,17 +4,17 @@ import { Timestamp } from "firebase-admin/firestore";
 
 export type BusinessCardData = {
   // 必須フィールド
-  personName: string;
-  personEmail: string;
-  personPhoneNumber: string;
+  personName: string|null;
+  personEmail: string| null;
+  personPhoneNumber: string| null;
   createdBy: string | DocumentReference;
-  companyName: string;
+  companyName: string|null;
   // オプショナルフィールド
   tradeShowId?: string | DocumentReference;
   companyId?: string | DocumentReference;
-  websiteURL?: string;
-  role?: string;
-  companyAddress?: string;
+  websiteURL?: string|null;
+  role?: string|null;
+  companyAddress?: string|null;
   memo?: string;
 
   // システムフィールド
