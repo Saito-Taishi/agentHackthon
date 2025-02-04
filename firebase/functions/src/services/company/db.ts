@@ -1,5 +1,5 @@
 import { getFirestore } from "firebase-admin/firestore";
-import { Company } from "../company-clawler/types";
+import { Company } from "../../types";
 
 export async function saveCompany(company: Company) {
   const firestore = getFirestore();

@@ -1,5 +1,5 @@
 import { Browser, chromium, Page } from "playwright";
-import { ExtractedData } from "./types";
+import { ExtractedData } from "../../types";
 
 export class CompanyScraper {
   private browser: Browser | null = null;
