@@ -10,7 +10,7 @@ export default function UploadPage() {
 
   return (
     <div className="container mx-auto max-w-3xl">
-      {/* ヘッダー部分 */}      
+      {/* ヘッダー部分 */}
       {/* HEIC画像変換カード */}
       <div className="mb-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center">
         <svg
@@ -29,7 +29,7 @@ export default function UploadPage() {
         </svg>
         <div>
           <p className="text-yellow-800">
-            HEIC画像を直接アップロードする場合は、JPG形式に変換する必要があります。
+            「画像を選択」ボタンを押して、写真を撮影してください。
           </p>
           <a
             href="https://www.iloveimg.com/ja/convert-to-jpg"
@@ -37,7 +37,7 @@ export default function UploadPage() {
             rel="noopener noreferrer"
             className="mt-1 inline-block text-yellow-600 underline hover:text-yellow-800 font-medium"
           >
-            こちらをクリックして変換ページへ
+            スマホの画像をjpegに変換する場合はここをクリック
           </a>
         </div>
       </div>
