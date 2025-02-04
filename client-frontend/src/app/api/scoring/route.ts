@@ -14,7 +14,7 @@ export async function POST(request:Request){
             temperature:0
         })
         const openaiModel = new ChatOpenAI({
-            model:"gpt-4o",
+            model:"gpt-4o-mini",
             temperature:0
         })
         const scoringPrompt = await hub.pull("zenn_ai_agent_scoring")
