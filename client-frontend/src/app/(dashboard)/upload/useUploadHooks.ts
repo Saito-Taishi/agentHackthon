@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import heic2any from "heic2any";
 import type { Card } from "@/utils/types/card";
 import type { APIResponse } from "@/utils/api/response";
 
@@ -18,34 +17,36 @@ export function useImageUpload() {
 
 	const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files.length > 0) {
-			const newImageUrls: string[] = [];
-			const newFiles: Blob[] = [];
-			const file = e.target.files[0];
-			const isHeic =
-				file.type.includes("heic") ||
-				file.type.includes("heif") ||
-				file.name.toLowerCase().endsWith(".heic") ||
-				file.name.toLowerCase().endsWith(".heif");
-			if (isHeic) {
-				try {
-					const convertedBlob = await heic2any({
-						blob: file,
-						toType: "image/png",
-					});
-					newFiles.push(convertedBlob as Blob);
-					setSelectedFiles((prev) => [...prev, ...newFiles]);
-					const convertedURL = URL.createObjectURL(convertedBlob as Blob);
-					newImageUrls.push(convertedURL);
-				} catch {
-					return console.log("");
-				}
-			} else {
-				const imageUrl = URL.createObjectURL(file);
-				newFiles.push(file as Blob);
-				setSelectedFiles((prev) => [...prev, ...newFiles]);
-				newImageUrls.push(imageUrl);
-			}
-			setSelectedImages((prevImages) => [...prevImages, ...newImageUrls]);
+			// TODO HEICを処理できるようにする。
+			// const isHeic =
+			// 	file.type.includes("heic") ||
+			// 	file.type.includes("heif") ||
+			// 	file.name.toLowerCase().endsWith(".heic") ||
+			// 	file.name.toLowerCase().endsWith(".heif");
+			// if (isHeic) {
+			// }
+
+			// 複数ファイルを配列化
+			const filesArray = Array.from(e.target.files);
+			// HEICファイルは除外（拡張子で判定）
+			const filteredFiles = filesArray.filter(
+				(file) => !file.name.toLowerCase().endsWith(".heic"),
+			);
+
+			// 各ファイルをbase64にエンコード
+			const base64Promises = filteredFiles.map((file) => {
+				return new Promise<string>((resolve, reject) => {
+					const reader = new FileReader();
+					reader.onload = () => resolve(reader.result as string);
+					reader.onerror = reject;
+					reader.readAsDataURL(file);
+				});
+			});
+			const base64Files = await Promise.all(base64Promises);
+
+			// 状態に追加
+			setSelectedImages((prev) => [...prev, ...base64Files]);
+			setSelectedFiles((prev) => [...prev, ...filteredFiles]);
 		}
 	};
 
@@ -71,28 +72,24 @@ export function useImageUpload() {
 		try {
 			const results: UploadResponse[] = [];
 
-			// 各ファイルを圧縮してアップロード
+			// 全ファイルを圧縮してFormDataにまとめてアップロード
+			const formData = new FormData();
 			for (const file of selectedFiles) {
 				const compressedFile = await compressImage(file, 0.7);
-
-				// ここでサーバーへ送信する準備
-				// fetchでバイナリデータを送る場合の一例
-				const response = await fetch("/api/business_cards/upload", {
-					method: "POST",
-					// 任意のヘッダーなど追加したい場合はここに記述
-					// headers: {
-					//   "Content-Type": "image/jpeg",
-					// },
-					body: compressedFile,
-					credentials: "include",
-				});
-
-				const data = (await response.json()) as UploadResponse;
-				if (!response.ok || !data.success) {
-					throw new Error(data.message || "アップロードに失敗しました");
-				}
-				results.push(data);
+				formData.append("files", compressedFile);
 			}
+
+			const response = await fetch("/api/business_cards/upload", {
+				method: "POST",
+				body: formData,
+				credentials: "include",
+			});
+
+			const data = (await response.json()) as UploadResponse;
+			if (!response.ok || !data.success) {
+				throw new Error(data.message || "アップロードに失敗しました");
+			}
+			results.push(data);
 
 			console.log("アップロード結果:", results);
 			setSuccessMessage("名刺の登録が完了しました");

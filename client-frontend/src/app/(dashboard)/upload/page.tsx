@@ -10,7 +10,38 @@ export default function UploadPage() {
 
   return (
     <div className="container mx-auto max-w-3xl">
-      {/* ヘッダー部分 */}
+      {/* ヘッダー部分 */}      
+      {/* HEIC画像変換カード */}
+      <div className="mb-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center">
+        <svg
+          className="h-6 w-6 text-yellow-500 mr-3"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <title>HEIC画像変換</title>
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        <div>
+          <p className="text-yellow-800">
+            HEIC画像を直接アップロードする場合は、JPG形式に変換する必要があります。
+          </p>
+          <a
+            href="https://www.iloveimg.com/ja/convert-to-jpg"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-1 inline-block text-yellow-600 underline hover:text-yellow-800 font-medium"
+          >
+            こちらをクリックして変換ページへ
+          </a>
+        </div>
+      </div>
+
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold">名刺画像を選択</h1>
         {/* 実行ボタン */}
@@ -102,6 +133,7 @@ export default function UploadPage() {
         </div>
       )}
 
+
       {/* 画像選択エリア */}
       <div className="mb-8">
         <label
@@ -132,7 +164,7 @@ export default function UploadPage() {
             id="image-upload"
             type="file"
             className="hidden"
-            accept="image/*,.heic,.HEIC"
+            accept="image/jpeg, image/png,"
             multiple
             onChange={handleImageSelect}
           />
