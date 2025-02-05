@@ -38,9 +38,12 @@ importers:
       openai:
         specifier: ^4.79.1
         version: 4.80.1(zod@3.24.1)
-      playwright:
-        specifier: ^1.50.0
-        version: 1.50.0
+      playwright-aws-lambda:
+        specifier: ^0.11.0
+        version: 0.11.0(playwright-core@1.50.1)
+      playwright-core:
+        specifier: ^1.50.1
+        version: 1.50.1
     devDependencies:
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.12.0
@@ -1408,11 +1411,6 @@ packages:
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
 
-  fsevents@2.3.2:
-    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
-    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
-    os: [darwin]
-
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -1995,6 +1993,13 @@ packages:
     resolution: {integrity: sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==}
     engines: {node: '>=6'}
 
+  lambdafs@2.1.1:
+    resolution: {integrity: sha512-x5k8JcoJWkWLvCVBzrl4pzvkEHSgSBqFjg3Dpsc4AcTMq7oUMym4cL/gRTZ6VM4mUMY+M0dIbQ+V1c1tsqqanQ==}
+    engines: {node: '>= 10.16'}
+    hasBin: true
+    bundledDependencies:
+      - tar-fs
+
   langchain@0.3.13:
     resolution: {integrity: sha512-QIQocx2goCBMgCw+hXjDiCW/5P/Q4HbNjaGEbG2FPHzFl48aw36GJvcyEbg91GqjhyH+lsIlYIWMcdDqn5Z5Lw==}
     engines: {node: '>=18'}
@@ -2389,13 +2394,14 @@ packages:
     resolution: {integrity: sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==}
     engines: {node: '>=8'}
 
-  playwright-core@1.50.0:
-    resolution: {integrity: sha512-CXkSSlr4JaZs2tZHI40DsZUN/NIwgaUPsyLuOAaIZp2CyF2sN5MM5NJsyB188lFSSozFxQ5fPT4qM+f0tH/6wQ==}
-    engines: {node: '>=18'}
-    hasBin: true
+  playwright-aws-lambda@0.11.0:
+    resolution: {integrity: sha512-PVwGbLWMHrtgKigCHgg6VOOtFWci/IyvfDK1llrU4QOp+U5K8i0vpXTEOkTRMjfTHBcDhUueWMln4C/za0CpdQ==}
+    engines: {node: '>= 8.0.0'}
+    peerDependencies:
+      playwright-core: ^1
 
-  playwright@1.50.0:
-    resolution: {integrity: sha512-+GinGfGTrd2IfX1TA4N2gNmeIksSb+IAe589ZH+FlmpV3MYTx6+buChGIuDLQwrGNCw2lWibqV50fU510N7S+w==}
+  playwright-core@1.50.1:
+    resolution: {integrity: sha512-ra9fsNWayuYumt+NiM069M6OkcRb1FZSK8bgi66AtpFoWkg2+y0bJSNmkFrWhMbEBbVKC/EruAHH3g0zmtwGmQ==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -4745,9 +4751,6 @@ snapshots:
 
   fs.realpath@1.0.0: {}
 
-  fsevents@2.3.2:
-    optional: true
-
   fsevents@2.3.3:
     optional: true
 
@@ -5613,6 +5616,8 @@ snapshots:
 
   kleur@3.0.3: {}
 
+  lambdafs@2.1.1: {}
+
   langchain@0.3.13(@langchain/core@0.3.36(openai@4.80.1(zod@3.24.1)))(@langchain/google-genai@0.1.6(@langchain/core@0.3.36(openai@4.80.1(zod@3.24.1)))(zod@3.24.1))(@langchain/google-vertexai@0.1.8(@langchain/core@0.3.36(openai@4.80.1(zod@3.24.1)))(zod@3.24.1))(openai@4.80.1(zod@3.24.1)):
     dependencies:
       '@langchain/core': 0.3.36(openai@4.80.1(zod@3.24.1))
@@ -5936,13 +5941,12 @@ snapshots:
     dependencies:
       find-up: 4.1.0
 
-  playwright-core@1.50.0: {}
-
-  playwright@1.50.0:
+  playwright-aws-lambda@0.11.0(playwright-core@1.50.1):
     dependencies:
-      playwright-core: 1.50.0
-    optionalDependencies:
-      fsevents: 2.3.2
+      lambdafs: 2.1.1
+      playwright-core: 1.50.1
+
+  playwright-core@1.50.1: {}
 
   possible-typed-array-names@1.0.0: {}
 
