@@ -21,6 +21,7 @@
     "@langchain/google-genai": "^0.1.6",
     "@langchain/google-vertexai": "^0.1.8",
     "@langchain/openai": "^0.4.2",
+    "chromium": "^3.0.3",
     "firebase-admin": "^13.0.2",
     "firebase-functions": "^6.3.0",
     "langchain": "^0.3.12",
