@@ -161,6 +161,11 @@ const uploadToCloudStorage = async (file: Blob, uid: string): Promise<void> => {
   const filePath = `${uid}/${Date.now()}-${Math.random()
     .toString(36)
     .substring(2, 15)}.jpg`;
+  const metadata = {
+    customMetadata: {
+      userId: uid, // We already have the verified UID from the parameter
+    },
+  };
   const storageRef = ref(storage, filePath);
-  await uploadBytes(storageRef, file);
+  await uploadBytes(storageRef, file, metadata);
 };
