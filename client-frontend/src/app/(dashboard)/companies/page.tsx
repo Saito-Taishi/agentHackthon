@@ -137,7 +137,7 @@ export default function CompaniesPage() {
                   </td>
                   <td className="px-3 py-4 text-sm text-gray-500">
                     <div className="flex flex-wrap gap-1.5">
-                      {company.businessActivities.map((business) => (
+                      {company.businessActivities?.map((business) => (
                         <span
                           key={`${company}-${business}`}
                           className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10"
