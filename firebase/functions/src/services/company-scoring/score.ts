@@ -6,12 +6,9 @@ const COMPANY_SCORE = ["high", "mid", "low", "unknown"] as const;
 export type CompanyScore = (typeof COMPANY_SCORE)[number];
 
 export async function scoreCompany(
-  role: string,
-  employeeCount: number
+  role?: string,
+  employeeCount?: string
 ): Promise<CompanyScore> {
-  if (!role || !employeeCount) {
-    throw new Error("role or employeeCount is missing");
-  }
   const geminiModel = new ChatGoogleGenerativeAI({
     model: "gemini-2.0-flash-exp",
     temperature: 0,

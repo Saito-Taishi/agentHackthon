@@ -8,8 +8,6 @@ import { saveCompany } from "./services/company/db";
 import { setGlobalOptions } from "firebase-functions/v2";
 import { linkBusinessCard, updateScore } from "./services/business-card/db";
 import { scoreCompany } from "./services/company-scoring/score";
-import { linkBusinessCard, updateScore } from "./services/business-card/db";
-import { scoreCompany } from "./services/company-scoring/score";
 
 setGlobalOptions({
   region: "asia-northeast1",
@@ -65,11 +63,7 @@ export const scrapeCompanyInfo = onDocumentCreated(
 
     const role = snapshot.role;
     const employeeCount = crawlResult.company.employeeCount;
-    if (!role || !employeeCount || !parseInt(employeeCount)) {
-      throw new Error("Role or employeeCount is missing");
-    }
-
-    const companyScore = await scoreCompany(role, Number(employeeCount));
+    const companyScore = await scoreCompany(role, employeeCount);
     await updateScore(businessCardID, companyScore);
   }
 );
