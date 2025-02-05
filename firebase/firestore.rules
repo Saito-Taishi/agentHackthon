@@ -5,13 +5,16 @@ service cloud.firestore {
     function isAuthenticated() {
       return request.auth != null;
     }
-    function isUserAuthenticated(userId) {
-      return request.auth.uid == userId;
-    }
 
     // Only allow users to access their own business cards.
     match /business_cards/{cardId} {
-      allow read, write: if isAuthenticated();
+      // 新規作成時は、リクエストのデータ内の createdBy が auth.uid と一致することを確認
+      allow create: if isAuthenticated() &&
+                    request.auth.uid == request.resource.data.createdBy;
+      
+      // 既存ドキュメントへの読み込み、更新、削除時は、既存データの createdBy と auth.uid が一致していることを確認
+      allow read, update, delete: if isAuthenticated() &&
+                                   resource.data.createdBy == request.auth.uid;
     }
     match /companies/{companyId} {
       allow read, write: if isAuthenticated();
