@@ -1,17 +1,14 @@
 import * as admin from "firebase-admin";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
+import { onDocumentCreated } from "firebase-functions/firestore";
 import { auth } from "firebase-functions/v1";
-import { setGlobalOptions } from "firebase-functions/v2";
-import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { onRequest } from "firebase-functions/v2/https";
 import { crawlCompanyInfo } from "./functions/company-info";
-import { linkBusinessCard, updateScore } from "./services/business-card/db";
 import { saveCompany } from "./services/company/db";
-import { scoreCompany } from "./services/company-scoring/score";
+import { setGlobalOptions } from "firebase-functions/v2";
 
 setGlobalOptions({
   region: "asia-northeast1",
-  timeoutSeconds: 300, // 5分
 });
 
 admin.initializeApp();
@@ -41,64 +38,39 @@ export const createUserDocument = auth
   });
 
 export const scrapeCompanyInfo = onDocumentCreated(
-  {
-    document: "business_cards/{id}",
-    memory: "1GiB",
-  },
+  "business_cards/{id}",
   async (event) => {
-    if (!event.data) {
-      throw new Error("No data in event");
-    }
-    const businessCard = event.data?.data();
-    if (!businessCard || !businessCard.websiteURL) {
-      throw new Error("No data in snapshot or websiteURL is missing");
+    const snapshot = event.data?.data();
+    if (!snapshot || !snapshot.websiteURL) {
+      console.error("No data in snapshot or websiteURL is missing");
+      return;
     }
 
-    const crawlResult = await crawlCompanyInfo(businessCard.websiteURL);
+    const crawlResult = await crawlCompanyInfo(snapshot.websiteURL);
     if (!crawlResult.success) {
-      throw new Error("Error crawling company info: " + crawlResult.error);
-    }
-    const { company } = crawlResult;
-    const companyRef = await saveCompany(company);
-    if (!companyRef) {
-      throw new Error("Error saving company info");
+      console.error("Error crawling company info:", crawlResult.error);
+      return;
     }
 
-    await linkBusinessCard(event.params.id, companyRef);
-
-    if (
-      !businessCard.role ||
-      !company.employeeCount ||
-      !parseInt(company.employeeCount)
-    ) {
-      throw new Error("スコア計算に必要な情報が名刺に足りません");
-    }
-
-    const score = await scoreCompany(
-      businessCard.role,
-      Number(company.employeeCount)
-    );
-    await updateScore(event.params.id, score);
+    await saveCompany(crawlResult.company);
   }
 );
 
-if (process.env.FUNCTIONS_EMULATOR) {
-  module.exports.debugCompanyCrawler = onRequest(async (req, res) => {
-    console.log("debugCompanyCrawler");
+export const debugCompanyCrawler = onRequest(async (req, res) => {
+  console.log("debugCompanyCrawler");
 
-    try {
-      const crawlResult = await crawlCompanyInfo("https://www.a-s-ist.com");
-      console.log("crawlResult:", crawlResult);
-      if (!crawlResult.success) {
-        res.status(500).json({ error: crawlResult.error });
-        return;
-      }
-
-      await saveCompany(crawlResult.company);
-      res.status(200).json(crawlResult.company);
-    } catch (error) {
-      console.error("Error in debugCompanyCrawler:", error);
-      res.status(500).json({ error: "Internal server error" });
+  try {
+    const crawlResult = await crawlCompanyInfo("https://www.a-s-ist.com");
+    console.log("crawlResult:", crawlResult);
+    if (!crawlResult.success) {
+      res.status(500).json({ error: crawlResult.error });
+      return;
     }
-  });
-}
+
+    await saveCompany(crawlResult.company);
+    res.status(200).json(crawlResult.company);
+  } catch (error) {
+    console.error("Error in debugCompanyCrawler:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
