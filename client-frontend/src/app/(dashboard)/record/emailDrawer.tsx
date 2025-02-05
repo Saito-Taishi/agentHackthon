@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import {
     DrawerActionTrigger,
     DrawerBackdrop,
@@ -16,22 +16,31 @@ import { Toaster, toaster } from "@/components/ui/toaster"
 
 
 
-
 interface EmailDrawerProps {
     open: boolean
     setOpen: (open: boolean) => void
     selectedRecords: SelectedRecords[]
-    emailSubject: string
-    setEmailSubject: (subject: string) => void
+
 }
 
-export const EmailDrawer = ({ open, setOpen, selectedRecords, emailSubject, setEmailSubject }: EmailDrawerProps) => {
+export const EmailDrawer = ({ open, setOpen, selectedRecords }: EmailDrawerProps) => {
     const [emailDraft, setEmailDraft] = useState("")
+    const emailDraftRef = useRef<HTMLTextAreaElement>(null);
     // プレースホルダーを管理するステート
     const [placeholders] = useState([
         { key: 'companyName', label: '会社名', placeholder: '{会社名}' },
         { key: 'personName', label: '氏名', placeholder: '{氏名}' },
     ]);
+    // ドロップダウンメニュー用の状態とオプションを追加
+    const dropdownOptions = ["展示会", "営業・商談"];
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [selectedDropdown, setSelectedDropdown] = useState(dropdownOptions[0]);
+
+    // 追加: dropdownの選択によってemailDraftの値を変更するためのマッピング
+    const draftMapping: Record<string, string> = {
+        "展示会": "{会社名}\n{氏名} 様\n\n拝啓\n\n時下ますますご清祥のこととお慶び申し上げます。\n\n本日開催されました「〇〇展示会」にて名刺交換をさせていただきました、〇〇と申します。\n\nご多忙の中、弊社ブースにお立ち寄りいただき、誠にありがとうございました。\n\n当ブースでは、弊社製品・サービスについてご案内させていただきました。\n詳しい資料につきましては、後日改めてご連絡させていただきます。\n\nご不明な点やご質問などございましたら、お気軽にご連絡ください。\n\n今後ともご愛顧賜りますよう、よろしくお願い申し上げます。\n\n敬具\n\n━━━━━━━━━━━━━━━━━━━━━━━━\n株式会社□□\n営業部 山田 太郎\nTEL：03-XXXX-XXXX\nEmail：yamada@example.com\n━━━━━━━━━━━━━━━━━━━━━━━━",
+        "営業・商談": "{会社名}\n{氏名} 様\n\nお世話になっております。本日貴社に伺いました〇〇でございます。ご多忙のなか、貴重なお時間を割いていただき誠にありがとうございました。名刺交換と弊社の製品に関する説明の機会を頂き恐縮です。\n\n本日ご説明させていただきました内容につきまして、下記の資料を添付させていただきます。\n\n【製品資料】\n・〇〇〇製品カタログ\n・導入事例集\n・概算見積書\n\nご多用のところ大変恐縮ではございますが、ご確認いただけますと幸いです。\n\nご不明な点やご質問等ございましたら、お気軽にご連絡ください。\n引き続きよろしくお願い申し上げます。\n\n━━━━━━━━━━━━━━━━━━━━━━━━\n株式会社□□\n〇〇部 〇〇\nTEL：03-XXXX-XXXX\nEmail：yamada@example.com\n━━━━━━━━━━━━━━━━━━━━━━━━",
+    };
 
     // プレースホルダーを実際の値に置換する関数
     const replacePlaceholders = (text: string, record: { personName: string, companyName: string }) => {
@@ -44,13 +53,26 @@ export const EmailDrawer = ({ open, setOpen, selectedRecords, emailSubject, setE
     };
 
     const insertPlaceholder = (placeholder: string) => {
-        setEmailDraft(prevBody => prevBody + placeholder);
+        if (emailDraftRef.current) {
+            const textarea = emailDraftRef.current;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const before = emailDraft.substring(0, start);
+            const after = emailDraft.substring(end);
+            const newText = before + placeholder + after;
+            setEmailDraft(newText);
+            setTimeout(() => {
+                textarea.focus();
+                textarea.setSelectionRange(start + placeholder.length, start + placeholder.length);
+            }, 0);
+        } else {
+            setEmailDraft(prevBody => prevBody + placeholder);
+        }
     };
 
     const copyTextToClipboard = async (text: string) => {
         try {
             await navigator.clipboard.writeText(text);
-            // Optionally add user feedback here, e.g., an alert or toast.
         } catch (error) {
             console.error("Failed to copy text", error);
         }
@@ -85,18 +107,50 @@ export const EmailDrawer = ({ open, setOpen, selectedRecords, emailSubject, setE
                     </div>
 
                     <div className="space-y-4">
-                        <div>
-                            <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                                件名
-                            </label>
-                            <input
-                                type="text"
-                                id="subject"
-                                value={emailSubject}
-                                onChange={(e) => setEmailSubject(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                placeholder="メールの件名を入力してください"
-                            />
+                        <div className="relative inline-block text-left">
+                            <div>
+                                <button
+                                    type="button"
+                                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                                    className="inline-flex justify-center w-80 px-4 py-2 bg-white text-sm font-medium text-gray-700 rounded-md border border-gray-300 shadow-sm hover:bg-gray-50 focus:outline-none"
+                                >
+                                    {selectedDropdown}
+                                    <svg
+                                        className="-mr-1 ml-2 h-5 w-5"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z"
+                                            clipRule="evenodd"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                            {dropdownOpen && (
+                                <div className="origin-top absolute left-1/2 mt-2 w-80 transform -translate-x-1/2 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                                    <div className="py-1">
+                                        {dropdownOptions.map((option) => (
+                                            <button
+                                                key={option}
+                                                onClick={() => {
+                                                    setSelectedDropdown(option);
+                                                    setDropdownOpen(false);
+                                                    // ドロップダウンの選択によりemailDraftの値を更新
+                                                    setEmailDraft(draftMapping[option]);
+                                                }}
+                                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                type="button" // 明示的にtype="button"を指定
+                                            >
+                                                {option}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div>
@@ -119,6 +173,7 @@ export const EmailDrawer = ({ open, setOpen, selectedRecords, emailSubject, setE
                             {/* メール内容入力欄 */}
                             <textarea
                                 id="body"
+                                ref={emailDraftRef}
                                 value={emailDraft}
                                 onChange={(e) => setEmailDraft(e.target.value)}
                                 rows={10}

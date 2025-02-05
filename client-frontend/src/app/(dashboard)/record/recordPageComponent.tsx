@@ -11,8 +11,6 @@ export default function RecordPageComponent() {
         selectedRecords,
         open,
         setOpen,
-        emailSubject,
-        setEmailSubject,
     } = useRecordHooks();
     const hasSelectedRecords = selectedRecords.length > 0; // 選択されたレコードがあるかどうか
 
@@ -176,8 +174,8 @@ export default function RecordPageComponent() {
                                     <td className="whitespace-nowrap px-3 py-4 text-sm">
                                         <span
                                             className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${record.status
-                                                    ? "bg-green-100 text-green-800"
-                                                    : "bg-gray-100 text-gray-800"
+                                                ? "bg-green-100 text-green-800"
+                                                : "bg-gray-100 text-gray-800"
                                                 }`}
                                         >
                                             {record.status ? "完了" : "未処理"}
@@ -234,8 +232,6 @@ export default function RecordPageComponent() {
                 open={open}
                 setOpen={setOpen}
                 selectedRecords={selectedRecords}
-                emailSubject={emailSubject}
-                setEmailSubject={setEmailSubject}
             />
         </div>
     );

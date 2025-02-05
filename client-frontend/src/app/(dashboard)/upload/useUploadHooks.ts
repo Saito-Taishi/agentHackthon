@@ -130,7 +130,6 @@ const compressImage = async (file: Blob, quality = 0.7): Promise<Blob> => {
 		new Compressor(file, {
 			quality,
 			success(result) {
-				// result is a File (extends Blob)
 				resolve(result);
 			},
 			error(err) {
