@@ -21,13 +21,13 @@
     "@langchain/google-genai": "^0.1.6",
     "@langchain/google-vertexai": "^0.1.8",
     "@langchain/openai": "^0.4.2",
-    "chromium": "^3.0.3",
     "firebase-admin": "^13.0.2",
     "firebase-functions": "^6.3.0",
     "langchain": "^0.3.12",
     "langsmith": "^0.3.0",
     "openai": "^4.79.1",
-    "playwright": "^1.50.0"
+    "playwright-aws-lambda": "^0.11.0",
+    "playwright-core": "^1.50.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.12.0",

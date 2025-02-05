@@ -11,7 +11,7 @@ import { scoreCompany } from "./services/company-scoring/score";
 
 setGlobalOptions({
   region: "asia-northeast1",
-  timeoutSeconds: 300,
+  timeoutSeconds: 300, // 5分
 });
 
 admin.initializeApp();

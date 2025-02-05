@@ -1,12 +1,13 @@
-import { Browser, chromium, Page } from "playwright";
+import playWright from "playwright-aws-lambda";
+import { ChromiumBrowser, Page } from "playwright-core";
 import { ExtractedData } from "../../types";
 
 export class CompanyScraper {
-  private browser: Browser | null = null;
+  private browser: ChromiumBrowser | null = null;
   private page: Page | null = null;
 
   async initialize(): Promise<void> {
-    this.browser = await chromium.launch();
+    this.browser = await playWright.launchChromium();
     const context = await this.browser.newContext();
     this.page = await context.newPage();
   }
