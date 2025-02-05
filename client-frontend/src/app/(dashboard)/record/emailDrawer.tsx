@@ -10,7 +10,10 @@ import {
     DrawerFooter,
     DrawerRoot,
 } from "@/components/ui/drawer"
+import { Button } from "@/components/ui/button"
 import type { SelectedRecords } from "./useRecordHooks"
+import { Toaster, toaster } from "@/components/ui/toaster"
+
 
 
 
@@ -137,13 +140,22 @@ export const EmailDrawer = ({ open, setOpen, selectedRecords, emailSubject, setE
                                                     </p>
                                                 </div>
                                                 <div className="mt-2">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => copyTextToClipboard(replacePlaceholders(emailDraft, record))}
+                                                    <Button
+                                                        onClick={() => {
+                                                            copyTextToClipboard(replacePlaceholders(emailDraft, record));
+                                                            toaster.create({
+                                                                title: `${record.personEmail}宛のメールをコピー`,
+                                                                type: "success",
+                                                                action: {
+                                                                    label: "OK",
+                                                                    onClick: () => console.log()
+                                                                }
+                                                            })
+                                                        }}
                                                         className="px-2 py-1 text-xs font-medium text-white bg-indigo-500 rounded hover:bg-indigo-600"
                                                     >
                                                         コピー
-                                                    </button>
+                                                    </Button>
                                                 </div>
                                             </div>
                                         </div>
@@ -166,6 +178,7 @@ export const EmailDrawer = ({ open, setOpen, selectedRecords, emailSubject, setE
                 </DrawerFooter>
                 <DrawerCloseTrigger />
             </DrawerContent>
+            <Toaster />
         </DrawerRoot>
     )
 }
