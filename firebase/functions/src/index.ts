@@ -41,7 +41,10 @@ export const createUserDocument = auth
   });
 
 export const scrapeCompanyInfo = onDocumentCreated(
-  "business_cards/{id}",
+  {
+    document: "business_cards/{id}",
+    memory: "1GiB",
+  },
   async (event) => {
     if (!event.data) {
       throw new Error("No data in event");
