@@ -166,9 +166,8 @@ export default function CompaniesPage() {
 
       {/* サイドバー */}
       <div
-        className={`fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
-          open ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${open ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="h-full overflow-y-auto">
           <div className="p-6 border-b border-gray-200">
