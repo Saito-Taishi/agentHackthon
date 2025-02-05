@@ -43,10 +43,10 @@ export const EmailDrawer = ({ open, setOpen, selectedRecords }: EmailDrawerProps
     };
 
     // プレースホルダーを実際の値に置換する関数
-    const replacePlaceholders = (text: string, record: { personName: string, companyName: string }) => {
+    const replacePlaceholders = (text: string, record: { personName: string | null, companyName: string | null }) => {
         let replacedText = text;
         for (const p of placeholders) {
-            const replacementValue = record[p.key as keyof typeof record] || '';
+            const replacementValue = record[p.key as keyof typeof record] ?? '';
             replacedText = replacedText.replace(p.placeholder, replacementValue);
         }
         return replacedText;
