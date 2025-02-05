@@ -133,18 +133,20 @@ export default function CompaniesPage() {
                     {company.capital || "情報なし"}
                   </td>
                   <td className="px-3 py-4 text-sm text-gray-500">
-                    {company.established}
+                    {company.established || "情報なし"}
                   </td>
                   <td className="px-3 py-4 text-sm text-gray-500">
                     <div className="flex flex-wrap gap-1.5">
-                      {company.businessActivities?.map((business) => (
-                        <span
-                          key={`${company}-${business}`}
-                          className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10"
-                        >
-                          {business}
-                        </span>
-                      ))}
+                      {company.businessActivities?.length
+                        ? company.businessActivities.map((business) => (
+                            <span
+                              key={`${company}-${business}`}
+                              className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10"
+                            >
+                              {business}
+                            </span>
+                          ))
+                        : "情報なし"}
                     </div>
                   </td>
                   <td className="px-3 py-4 text-sm">
@@ -166,8 +168,9 @@ export default function CompaniesPage() {
 
       {/* サイドバー */}
       <div
-        className={`fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${open ? "translate-x-0" : "translate-x-full"
-          }`}
+        className={`fixed top-0 right-0 h-full w-[480px] bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+          open ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         <div className="h-full overflow-y-auto">
           <div className="p-6 border-b border-gray-200">
