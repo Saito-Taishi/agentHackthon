@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Card } from "@/utils/types/card";
 import type { APIResponse } from "@/utils/api/response";
+import Compressor from "compressorjs";
 
 type UploadResponse = APIResponse<Card>;
 
@@ -119,43 +120,21 @@ export function useImageUpload() {
 }
 
 /**
- * canvasを使って画像を圧縮する関数
+ * 画像を圧縮する関数（compressorjsを使用）
  * @param file 圧縮対象の画像ファイル（Blob）
  * @param quality 圧縮品質（0～1、例:0.7）
  * @returns 圧縮後のBlob（JPEG形式）
  */
 const compressImage = async (file: Blob, quality = 0.7): Promise<Blob> => {
 	return new Promise((resolve, reject) => {
-		const image = new Image();
-		image.src = URL.createObjectURL(file);
-
-		image.onload = () => {
-			const canvas = document.createElement("canvas");
-			canvas.width = image.width;
-			canvas.height = image.height;
-
-			const ctx = canvas.getContext("2d");
-			if (!ctx) {
-				return reject(new Error("Canvasのコンテキストが取得できませんでした"));
-			}
-
-			// ここでリサイズも可能（必要があれば width / height を適切に計算）
-			ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-
-			// JPEGで再エンコードしてBlob化
-			canvas.toBlob(
-				(blob) => {
-					if (blob) {
-						resolve(blob);
-					} else {
-						reject(new Error("画像の圧縮に失敗しました"));
-					}
-				},
-				"image/jpeg",
-				quality,
-			);
-		};
-
-		image.onerror = () => reject(new Error("画像の読み込みに失敗しました"));
+		new Compressor(file, {
+			quality,
+			success(result) {
+				resolve(result);
+			},
+			error(err) {
+				reject(new Error(err.message));
+			},
+		});
 	});
 };
