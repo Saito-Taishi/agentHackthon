@@ -38,7 +38,10 @@ export const createUserDocument = auth
   });
 
 export const scrapeCompanyInfo = onDocumentCreated(
-  "business_cards/{id}",
+  {
+    memory: "1GiB",
+    document: "business_cards/{id}",
+  },
   async (event) => {
     const snapshot = event.data?.data();
     if (!snapshot || !snapshot.websiteURL) {
