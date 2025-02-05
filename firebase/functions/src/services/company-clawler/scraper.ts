@@ -1,4 +1,4 @@
-import playWright from "playwright-aws-lambda";
+import * as playWright from "playwright-aws-lambda";
 import { ChromiumBrowser, Page } from "playwright-core";
 import { ExtractedData } from "../../types";
 
