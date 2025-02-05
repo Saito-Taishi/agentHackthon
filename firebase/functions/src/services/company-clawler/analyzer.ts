@@ -2,7 +2,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
 import * as hub from "langchain/hub";
-import { ExtractedData, Company } from "./types";
+import { ExtractedData, Company } from "../../types";
 
 export class CompanyAnalyzer {
   private model: ChatOpenAI;
