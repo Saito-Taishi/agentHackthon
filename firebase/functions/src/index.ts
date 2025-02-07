@@ -69,22 +69,3 @@ export const scrapeCompanyInfo = onDocumentCreated(
     await updateScore(businessCardID, companyScore);
   }
 );
-
-export const debugCompanyCrawler = onRequest(async (req, res) => {
-  console.log("debugCompanyCrawler");
-
-  try {
-    const crawlResult = await crawlCompanyInfo("https://www.a-s-ist.com");
-    console.log("crawlResult:", crawlResult);
-    if (!crawlResult.success) {
-      res.status(500).json({ error: crawlResult.error });
-      return;
-    }
-
-    await saveCompany(crawlResult.company);
-    res.status(200).json(crawlResult.company);
-  } catch (error) {
-    console.error("Error in debugCompanyCrawler:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
