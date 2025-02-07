@@ -2,12 +2,11 @@ import * as admin from "firebase-admin";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { onDocumentCreated } from "firebase-functions/firestore";
 import { auth } from "firebase-functions/v1";
-import { onRequest } from "firebase-functions/v2/https";
-import { crawlCompanyInfo } from "./functions/company-info";
-import { saveCompany } from "./services/company/db";
 import { setGlobalOptions } from "firebase-functions/v2";
-import { linkBusinessCard, updateScore } from "./services/business-card/db";
+import { crawlCompanyInfo } from "./functions/company-info";
+import { updateScore } from "./services/business-card/db";
 import { scoreCompany } from "./services/company-scoring/score";
+import { saveCompany } from "./services/company/db";
 
 setGlobalOptions({
   region: "asia-northeast1",
@@ -46,22 +45,25 @@ export const scrapeCompanyInfo = onDocumentCreated(
     document: "business_cards/{id}",
   },
   async (event) => {
-    const snapshot = event.data?.data();
-    if (!snapshot || !snapshot.websiteURL) {
+    const businessCardID = event.params.id;
+
+    const data = event.data;
+    if (!data || !data.data().websiteURL) {
       console.error("No data in snapshot or websiteURL is missing");
       return;
     }
+    const businessCard = data.data();
+    const businessCardRef = data.ref;
 
-    const crawlResult = await crawlCompanyInfo(snapshot.websiteURL);
+    const crawlResult = await crawlCompanyInfo(businessCard.websiteURL);
     if (!crawlResult.success) {
       console.error("Error crawling company info:", crawlResult.error);
       return;
     }
 
-    const companyRef = await saveCompany(crawlResult.company);
-    await linkBusinessCard(businessCardID, companyRef);
+    await saveCompany(crawlResult.company, businessCardRef);
 
-    const role = snapshot.role;
+    const role = businessCard.role;
     const employeeCount = crawlResult.company.employeeCount;
     const companyScore = await scoreCompany(role, employeeCount);
     await updateScore(businessCardID, companyScore);
