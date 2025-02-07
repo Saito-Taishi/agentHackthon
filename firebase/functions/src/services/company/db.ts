@@ -1,7 +1,6 @@
 import {
   DocumentData,
   DocumentReference,
-  FieldValue,
   getFirestore,
 } from "firebase-admin/firestore";
 import { Company } from "../../types";
@@ -23,7 +22,7 @@ export async function saveCompany(
       ...company,
       createdAt: now,
       updatedAt: now,
-      businessCardRefs: FieldValue.arrayUnion(businessCardRef),
+      businessCardRefs: businessCardRef,
     });
     return companyRef;
   } else {
