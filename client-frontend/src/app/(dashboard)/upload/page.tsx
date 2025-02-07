@@ -28,9 +28,6 @@ export default function UploadPage() {
           />
         </svg>
         <div>
-          <p className="text-yellow-800">
-            「画像を選択」ボタンを押して、写真を撮影してください。
-          </p>
           <a
             href="https://www.iloveimg.com/ja/convert-to-jpg"
             target="_blank"
@@ -41,6 +38,7 @@ export default function UploadPage() {
           </a>
         </div>
       </div>
+
 
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold">名刺画像を選択</h1>
@@ -136,6 +134,9 @@ export default function UploadPage() {
 
       {/* 画像選択エリア */}
       <div className="mb-8">
+        <div className="mb-2 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm font-semibold">
+          注意：ベータ版では１枚画像ずつ実行してください。複数枚選択するとエラーが発生します。
+        </div>
         <label
           htmlFor="image-upload"
           className="block w-full h-48 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
