@@ -17,7 +17,8 @@ service cloud.firestore {
                                    resource.data.createdBy == request.auth.uid;
     }
     match /companies/{companyId} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated()&&
+                          get(resource.data.cardRef).data.createdBy == request.auth.uid;
     }
 
     // Other collections and documents can be handled with separate rules.
