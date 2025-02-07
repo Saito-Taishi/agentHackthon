@@ -1,7 +1,15 @@
-import { getFirestore } from "firebase-admin/firestore";
+import {
+  DocumentData,
+  DocumentReference,
+  FieldValue,
+  getFirestore,
+} from "firebase-admin/firestore";
 import { Company } from "../../types";
 
-export async function saveCompany(company: Company) {
+export async function saveCompany(
+  company: Company,
+  businessCardRef: DocumentReference<DocumentData, DocumentReference>
+) {
   const firestore = getFirestore();
   const companiesRef = firestore.collection("companies");
 
@@ -11,10 +19,11 @@ export async function saveCompany(company: Company) {
   const now = new Date();
   if (querySnapshot.empty) {
     // No record exists for the domain, create a new one
-    const companyRef = await companiesRef.add({
+    const companyRef = await companiesRef.doc(company.domain).set({
       ...company,
       createdAt: now,
       updatedAt: now,
+      businessCardRefs: FieldValue.arrayUnion(businessCardRef),
     });
     return companyRef;
   } else {
