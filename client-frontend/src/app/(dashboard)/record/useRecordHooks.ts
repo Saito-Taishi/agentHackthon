@@ -11,6 +11,7 @@ interface BusinessCard {
   personEmail: string | null;
   personPhoneNumber: string | null;
   role: string | null;
+  companyCrawledAt: Date | null;
   createdAt: Date;
 }
 
@@ -34,22 +35,28 @@ export function useRecordHooks() {
 
   useEffect(() => {
     if (!user) return;
-
-    // users/{uid}/cards コレクションを参照
     const cardsRef = collection(db, `users/${user.uid}/cards`);
     const q = query(cardsRef, orderBy("createdAt", "desc"));
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const businessCards = snapshot.docs.map((doc) => {
-          const data = doc.data() as BusinessCard;
+        const businessCards: BusinessCard[] = snapshot.docs.map((doc) => {
+          const data = doc.data();
           return {
-            ...data,
-            id: doc.id,
-            status: false, // TODO: ステータスの管理方法を検討
+            imageURL: data.imageURL,
+            websiteURL: data.websiteURL,
+            companyName: data.companyName,
+            companyAddress: data.companyAddress,
+            personName: data.personName,
+            personEmail: data.personEmail,
+            personPhoneNumber: data.personPhoneNumber,
+            role: data.role,
+            companyCrawledAt: data.companyCrawledAt?.toDate() || null,
+            createdAt: data.createdAt.toDate(),
           };
         });
+
         setRecords(businessCards);
         setLoading(false);
         setError(null);
