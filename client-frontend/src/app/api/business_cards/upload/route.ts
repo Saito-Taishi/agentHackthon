@@ -1,4 +1,5 @@
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+// import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { ChatVertexAI } from "@langchain/google-vertexai";
 import { ChatOpenAI } from "@langchain/openai";
 import * as hub from "langchain/hub";
 import { validateSession } from "@/utils/auth/session";
@@ -68,15 +69,21 @@ export async function POST(request: Request) {
       const imageUrl = `data:image/png;base64,${base64}`;
 
       // AI処理
-      const geminiModel = new ChatGoogleGenerativeAI({
-        model: "gemini-2.0-flash-exp",
-        temperature: 0,
-      });
+
+      // const geminiModel = new ChatGoogleGenerativeAI({
+        // model: "gemini-2.0-flash-exp",
+        // temperature: 0,
+      // });
+
+      const vertexAImodel = new ChatVertexAI({
+        model:"gemini-2.0-flash-exp",
+        temperature:0
+      })
 
       const extractCartPrompt = await hub.pull("zenn_ai_agent_hackthon");
-      const geminiChain = extractCartPrompt.pipe(geminiModel);
+      const geminiChain = extractCartPrompt.pipe(vertexAImodel);
       const cardInfo = await geminiChain.invoke({ img_base64: imageUrl });
-
+      console.log("cardInfoの情報は以下のようになる",cardInfo)
       const textToJsonPrompt = await hub.pull("zenn_text_to_json");
       const openaiModel = new ChatOpenAI({
         model: "gpt-4o-mini",
