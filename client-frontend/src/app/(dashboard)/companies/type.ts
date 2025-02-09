@@ -20,8 +20,6 @@ export function isCompany(arg: unknown): arg is Company {
     "createdAt" in arg &&
     "updatedAt" in arg &&
     typeof (arg as Company).name === "string" &&
-    typeof (arg as Company).domain === "string" &&
-    (arg as Company).createdAt instanceof Date &&
-    (arg as Company).updatedAt instanceof Date
+    typeof (arg as Company).domain === "string"
   );
 }
