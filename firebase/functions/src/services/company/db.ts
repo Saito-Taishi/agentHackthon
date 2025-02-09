@@ -12,23 +12,20 @@ export interface CompanyInfo {
   established?: string;
 }
 
-export async function saveCompany(
-  userId: string,
-  cardId: string,
-  company: CompanyInfo
-) {
+export async function saveCompany(userId: string, company: CompanyInfo) {
   const firestore = getFirestore();
-  const companyRef = firestore
-    .collection(`users/${userId}/cards/${cardId}/company`)
-    .doc();
+  const companyRef = firestore.collection(`users/${userId}/companies`);
 
-  await companyRef.set({
+  await companyRef.add({
     ...company,
     createdAt: new Date(),
     updatedAt: new Date(),
   });
 
-  return companyRef;
+  return {
+    doc: companyRef,
+    company,
+  };
 }
 
 export async function getCompanyInfo(userId: string, cardId: string) {

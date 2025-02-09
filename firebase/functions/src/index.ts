@@ -88,9 +88,8 @@ export const handleFileUpload = onObjectFinalized(
       }
 
       const cardID = cardDoc.id;
-
       // 企業情報を保存
-      await saveCompany(userId, cardID, crawlResult.company);
+      await saveCompany(userId, crawlResult.company);
 
       // スコアを計算して更新
       const employeeCount = crawlResult.company.employeeCount;
