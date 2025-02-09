@@ -1,20 +1,8 @@
 "use client";
-import { useState } from "react";
-import { useEffect } from "react";
-import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "@/utils/config/firebase";
-
-interface Company {
-  id: string;
-  name: string;
-  domain: string;
-  employeeCount: string;
-  sales: string;
-  businessActivities: string[];
-  headOfficeAddress: string;
-  capital: string;
-  established: string;
-}
+import { auth, db } from "@/utils/config/firebase";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { Company, isCompany } from "./type";
 
 interface Employee {
   id: string;
@@ -101,29 +89,30 @@ export function useCompaniesHooks() {
   const [selectedCompanyName, setSelectedCompanyName] = useState("");
   const [selectedCompanyId, setSelectedCompanyId] = useState("");
   const [companies, setCompanies] = useState<Company[]>([]);
+  const user = auth.currentUser;
 
   useEffect(() => {
-    const where = [];
-    const companiesRef = collection(db, "companies");
+    if (!user) return;
+    const companiesRef = collection(db, `users/${user.uid}/companies`);
+
     const unsubscribe = onSnapshot(
-      companiesRef,
+      query(companiesRef, orderBy("createdAt", "desc")),
       (snapshot) => {
-        const companiesData = snapshot.docs.map((doc) => ({
+        const companies = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        })) as Company[];
-
-        console.log("companies", companiesData);
-        setCompanies(companiesData);
+        }));
+        setCompanies(companies.filter((company) => isCompany(company)));
       },
       (error) => {
         console.error("Error fetching companies:", error);
       }
     );
+
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [user, user?.uid]);
 
   const handleCompanyNameClick = (companyName: string, companyId: string) => {
     setSelectedCompanyName(companyName);

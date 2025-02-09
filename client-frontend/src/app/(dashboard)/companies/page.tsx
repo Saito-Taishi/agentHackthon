@@ -10,7 +10,6 @@ export default function CompaniesPage() {
     setOpen,
     selectedCompanyName,
     selectedCompanyId,
-    handleCompanyNameClick,
     getEmployeesByCompanyId,
   } = useCompaniesHooks();
 
@@ -91,17 +90,14 @@ export default function CompaniesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {companies.map((company) => (
-                <tr
-                  key={company.id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
+              {companies.map((company, idx) => (
+                <tr key={idx} className="hover:bg-gray-50 transition-colors">
                   <td className="py-4 pl-4 pr-3 text-sm sm:pl-6">
                     <button
                       className="font-semibold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
                       type="button"
                       onClick={() => {
-                        handleCompanyNameClick(company.name, company.id);
+                        // handleCompanyNameClick(company.name, company.id);
                       }}
                     >
                       {company.name}
