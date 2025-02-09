@@ -1,14 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import type { Card } from "@/utils/types/card";
-import type { APIResponse } from "@/utils/api/response";
 import Compressor from "compressorjs";
+import { useState } from "react";
 // Add Firebase Storage imports
-import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { auth } from "@/utils/config/firebase";
-
-type UploadResponse = APIResponse<Card>;
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 
 export function useImageUpload() {
   const [selectedFiles, setSelectedFiles] = useState<Blob[]>([]);
@@ -22,14 +18,6 @@ export function useImageUpload() {
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       // TODO HEICを処理できるようにする。
-      // const isHeic =
-      // 	file.type.includes("heic") ||
-      // 	file.type.includes("heif") ||
-      // 	file.name.toLowerCase().endsWith(".heic") ||
-      // 	file.name.toLowerCase().endsWith(".heif");
-      // if (isHeic) {
-      // }
-
       // 複数ファイルを配列化
       const filesArray = Array.from(e.target.files);
       // HEICファイルは除外（拡張子で判定）
@@ -80,30 +68,11 @@ export function useImageUpload() {
         throw new Error("ログインしてください");
       }
 
-      const results: UploadResponse[] = [];
-
-      // 全ファイルを圧縮してFormDataにまとめてアップロード
-      const formData = new FormData();
       for (const file of selectedFiles) {
-        const compressedFile = await compressImage(file, 0.7);
-        // Upload to Firebase Storage with the associated auth UID using SDK
+        const compressedFile = await compressImage(file, 1);
         await uploadToCloudStorage(compressedFile, authUid);
-        formData.append("files", compressedFile);
       }
 
-      const response = await fetch("/api/business_cards/upload", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-
-      const data = (await response.json()) as UploadResponse;
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "アップロードに失敗しました");
-      }
-      results.push(data);
-
-      console.log("アップロード結果:", results);
       setSuccessMessage("名刺の登録が完了しました");
       setSelectedImages([]);
       setSelectedFiles([]);
@@ -131,23 +100,42 @@ export function useImageUpload() {
 }
 
 /**
- * 画像を圧縮する関数（compressorjsを使用）
+ * 画像を1MB以下に圧縮する関数（compressorjsを使用）
  * @param file 圧縮対象の画像ファイル（Blob）
- * @param quality 圧縮品質（0～1、例:0.7）
+ * @param maxSizeInMB 最大ファイルサイズ（MB）
  * @returns 圧縮後のBlob（JPEG形式）
  */
-const compressImage = async (file: Blob, quality = 0.7): Promise<Blob> => {
-  return new Promise((resolve, reject) => {
-    new Compressor(file, {
-      quality,
-      success(result) {
-        resolve(result);
-      },
-      error(err) {
-        reject(new Error(err.message));
-      },
+const compressImage = async (file: Blob, initialQuality = 1): Promise<Blob> => {
+  const maxSizeInBytes = 1 * 1024 * 1024; // 1MB in bytes
+
+  const compress = async (quality: number): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      new Compressor(file, {
+        quality,
+        success(result) {
+          resolve(result);
+        },
+        error(err) {
+          reject(new Error(err.message));
+        },
+      });
     });
-  });
+  };
+
+  let result = await compress(initialQuality);
+  let quality = initialQuality;
+
+  // If still over 1MB, keep compressing with lower quality
+  while (result.size > maxSizeInBytes && quality > 0.1) {
+    quality -= 0.1;
+    result = await compress(quality);
+  }
+
+  if (result.size > maxSizeInBytes) {
+    throw new Error("画像を1MB以下に圧縮できませんでした");
+  }
+
+  return result;
 };
 
 /**
@@ -161,11 +149,7 @@ const uploadToCloudStorage = async (file: Blob, uid: string): Promise<void> => {
   const filePath = `${uid}/${Date.now()}-${Math.random()
     .toString(36)
     .substring(2, 15)}.jpg`;
-  const metadata = {
-    customMetadata: {
-      userId: uid, // We already have the verified UID from the parameter
-    },
-  };
+
   const storageRef = ref(storage, filePath);
-  await uploadBytes(storageRef, file, metadata);
+  await uploadBytes(storageRef, file);
 };
