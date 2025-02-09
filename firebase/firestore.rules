@@ -1,26 +1,22 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-
-    // Only allow users to access their own business cards.
-    match /business_cards/{cardId} {
-      // 新規作成時は、リクエストのデータ内の createdBy が auth.uid と一致することを確認
-      allow create: if isAuthenticated() &&
-                    request.auth.uid == request.resource.data.createdBy;
+    
+    // usersコレクションのルール
+    match /users/{userId} {
+      // 該当するuserIdのドキュメントを読めるかどうか
+      allow read, create, update, delete: if request.auth != null && request.auth.uid == userId;
       
-      // 既存ドキュメントへの読み込み、更新、削除時は、既存データの createdBy と auth.uid が一致していることを確認
-      allow read, update, delete: if isAuthenticated() &&
-                                   resource.data.createdBy == request.auth.uid;
+      // cardsサブコレクション
+      match /cards/{cardId} {
+        // cardsドキュメントの操作を許可するかどうか
+        allow read, create, update, delete: if request.auth != null && request.auth.uid == userId;
+        
+        // companyInfoサブコレクション
+        match /companyInfo/{companyId} {
+          allow read, create, update, delete: if request.auth != null && request.auth.uid == userId;
+        }
+      }
     }
-    match /companies/{companyId} {
-      allow read: if isAuthenticated()&&
-                          get(resource.data.cardRef).data.createdBy == request.auth.uid;
-    }
-
-    // Other collections and documents can be handled with separate rules.
   }
 }
