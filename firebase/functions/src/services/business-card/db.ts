@@ -4,7 +4,7 @@ import { BusinessCard } from "./type";
 
 export async function saveBusinessCard(
   userId: string,
-  cardData: Omit<BusinessCard, "createdAt">
+  cardData: Omit<BusinessCard, "createdAt" | "companyCrawledAt">
 ) {
   const firestore = getFirestore();
   const cardsRef = firestore.collection(`users/${userId}/cards`);
@@ -19,6 +19,7 @@ export async function saveBusinessCard(
     role: cardData.role || null,
     createdAt: new Date(),
     websiteURL: cardData.websiteURL || null,
+    companyCrawledAt: null,
   } satisfies BusinessCard;
 
   const cardDoc = await cardsRef.add(card);

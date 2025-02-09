@@ -7,6 +7,7 @@ export type BusinessCard = {
   personEmail: string | null;
   personPhoneNumber: string | null;
   role: string | null;
+  companyCrawledAt: Date | null;
   createdAt: Date;
 };
 
