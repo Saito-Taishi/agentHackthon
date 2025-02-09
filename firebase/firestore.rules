@@ -10,12 +10,12 @@ service cloud.firestore {
       // cardsサブコレクション
       match /cards/{cardId} {
         // cardsドキュメントの操作を許可するかどうか
+        allow read, create, update, delete: if request.auth != null && request.auth.uid == userId; 
+      }
+
+      // companiesサブコレクション
+      match /companies/{companyId} {
         allow read, create, update, delete: if request.auth != null && request.auth.uid == userId;
-        
-        // companyInfoサブコレクション
-        match /companyInfo/{companyId} {
-          allow read, create, update, delete: if request.auth != null && request.auth.uid == userId;
-        }
       }
     }
   }
