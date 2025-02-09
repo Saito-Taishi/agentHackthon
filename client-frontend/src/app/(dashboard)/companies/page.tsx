@@ -92,9 +92,9 @@ export default function CompaniesPage() {
             <tbody className="divide-y divide-gray-200">
               {companies.map((company, idx) => (
                 <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                  <td className="py-4 pl-4 pr-3 text-sm sm:pl-6">
+                  <td className="pl-4 text-sm">
                     <button
-                      className="font-semibold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                      className="font-semibold text-gray hover:text-blue-800 hover:underline cursor-pointer"
                       type="button"
                       onClick={() => {
                         // handleCompanyNameClick(company.name, company.id);
@@ -114,24 +114,24 @@ export default function CompaniesPage() {
                       {company.IPO}
                     </span>
                   </td> */}
-                  <td className="px-3 py-4 text-sm text-gray-500">
+                  <td className="px-2 py-3 text-sm text-gray-500">
                     {company.employeeCount
                       ? `${company.employeeCount}人`
                       : "情報なし"}
                   </td>
-                  <td className="px-3 py-4 text-sm text-gray-500">
+                  <td className="px-2 py-3 text-sm text-gray-500">
                     {company.sales || "情報なし"}
                   </td>
-                  <td className="px-3 py-4 text-sm text-gray-500">
+                  <td className="px-2 py-3 text-sm text-gray-500">
                     {company.headOfficeAddress}
                   </td>
-                  <td className="px-3 py-4 text-sm text-gray-500">
+                  <td className="px-2 py-3 text-sm text-gray-500">
                     {company.capital || "情報なし"}
                   </td>
-                  <td className="px-3 py-4 text-sm text-gray-500">
+                  <td className="px-2 py-3 text-sm text-gray-500">
                     {company.established || "情報なし"}
                   </td>
-                  <td className="px-3 py-4 text-sm text-gray-500">
+                  <td className="px-2 py-3 text-sm text-gray-500">
                     <div className="flex flex-wrap gap-1.5">
                       {company.businessActivities?.length
                         ? company.businessActivities.map((business) => (
@@ -145,16 +145,7 @@ export default function CompaniesPage() {
                         : "情報なし"}
                     </div>
                   </td>
-                  <td className="px-3 py-4 text-sm">
-                    <a
-                      href={`https://${company.domain}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 hover:underline"
-                    >
-                      {company.domain}
-                    </a>
-                  </td>
+                  <td className="px-2 py-3 text-sm"></td>
                 </tr>
               ))}
             </tbody>
