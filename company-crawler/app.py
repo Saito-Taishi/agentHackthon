@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify, request
 from typing_extensions import TypedDict
 import json
 from langchain import hub
@@ -10,18 +10,19 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, Field
+from typing import List
 
 load_dotenv()  # 同じディレクトリ(company-crawler)にある .env を読み込む
 
-llm = ChatOpenAI(model="gpt-4o", api_key="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")
+llm = ChatOpenAI(model="gpt-4o")
 
 class State(TypedDict):
     steps :int
     page :Page
     click_or_extract:str # "click" もしくは "extract" になる
-    employeeCont:str
+    employeeCount:str
     sales:str
-    businessActivities:str
+    businessActivities:List[str]
     headOfficeAddress:str
     capital:str
     established:str
@@ -156,23 +157,19 @@ async def extract_company_overview(state:State):
     lines = (line.strip() for line in text.splitlines())
     text = ' '.join(line for line in lines if line)
     prompt = hub.pull("zenn_company_overview")
-    
-    # prompt = ChatPromptTemplate.from_messages(
-    #     [
-    #         (
-    #             "system",
-    #             "あなたはこれからhtmlの情報を受け取ります。その中から会社の従業員人数に関する情報を抜き出すようにしてください"
-    #         ),
-    #         (
-    #             "human", "{input}"
-    #         )
-    #     ]
-    # )
+
     chain = prompt | llm
     res = chain.invoke({
         "question": text
     })
-    return res.content
+    return {
+        "employeeCount":res["employeeCount"],
+        "sales":res["sales"],
+        "businessActivities":res["businessActivities"],
+        "headOfficeAddress":res["headOfficeAddress"],
+        "capital": res["capital"],
+        "established":res["established"]
+    }
 
 
 async def extract_html_text(page: Page) -> str:
@@ -195,8 +192,7 @@ async def extract_html_text(page: Page) -> str:
     # 余分な空白や改行を整理
     lines = (line.strip() for line in text.splitlines())
     clean_text = " ".join(line for line in lines if line)
-    print(clean_text)
-    return 
+    return clean_text
 
 
 graph_builder = StateGraph(State)
@@ -226,31 +222,46 @@ graph_builder.add_edge("extract_company_overview", END)
 
 async def call_agent(page):
     graph = graph_builder.compile()
-    res = await graph.ainvoke({"steps":0, "page":page, "click_or_extract":"click"})
+    res = await graph.ainvoke({
+        "steps":0,
+        "page":page,
+        "click_or_extract":"click",
+        "employeeCont":"null",
+        "sales":"null",
+        "businessActivities":"null",
+        "headOfficeAddress":"null",
+        "capital":"null",
+        "established":"null",
+        })
+
     return res
 
 app = Flask(__name__)
 
 @app.route('/crawl', methods=['POST'])
 async def crawl_company():
-    # data = request.get_json()
+    data = request.get_json()
 
-    # if not data or 'url' not in data:
-    #     return jsonify({'error': 'URL is required'}), 400
+    if not data or 'url' not in data:
+        return jsonify({'error': 'URL is required'}), 400
 
-    # url = data['url']
+    url = data['url']
     playwright = await async_playwright().start()
     browser = await playwright.chromium.launch(headless=False)
     page = await browser.new_page()
-    url = "https://www.recruit.co.jp/"
     await page.goto(url)
     res = await call_agent(page)
     print("最終的な出力は以下のようになりました。", res)
-    
-    # JSONオブジェクトを文字列に変換して返す
-    result_text = json.dumps(res, ensure_ascii=False)
-    return result_text, 200, {'Content-Type': 'text/plain; charset=utf-8'}
-
+    await browser.close()
+    response_data = {
+        "employeeCount": res.get("employeeCount"),
+        "sales": res.get("sales"),
+        "businessActivities": res.get("businessActivities"),
+        "headOfficeAddress": res.get("headOfficeAddress"),
+        "capital": res.get("capital"),
+        "established": res.get("established")
+    }
+    return jsonify(response_data)
 
 
 if __name__ == '__main__':
