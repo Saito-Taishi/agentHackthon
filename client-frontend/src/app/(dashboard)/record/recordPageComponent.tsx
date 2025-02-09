@@ -83,17 +83,12 @@ export default function RecordPageComponent() {
                 >
                   電話番号
                 </th>
+
                 <th
                   scope="col"
                   className="px-3 py-4 text-left text-sm font-semibold text-gray-900"
                 >
-                  ウェブサイト
-                </th>
-                <th
-                  scope="col"
-                  className="px-3 py-4 text-left text-sm font-semibold text-gray-900"
-                >
-                  ステータス
+                  企業取得
                 </th>
                 <th
                   scope="col"
@@ -135,7 +130,16 @@ export default function RecordPageComponent() {
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-900">
-                    {record.companyName}
+                    {
+                      // 会社名がURLの場合はリンクにする
+                      record.websiteURL ? (
+                        <a href={record.websiteURL} className="text-blue-600">
+                          {record.companyName}
+                        </a>
+                      ) : (
+                        record.companyName
+                      )
+                    }
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
                     {record.personName}
@@ -159,18 +163,15 @@ export default function RecordPageComponent() {
                     {record.personPhoneNumber}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm">
-                    {record.websiteURL}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm">
-                    {/* <span
+                    <span
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        record.status
+                        record.companyCrawledAt
                           ? "bg-green-100 text-green-800"
                           : "bg-gray-100 text-gray-800"
                       }`}
                     >
-                      {record.status ? "完了" : "未処理"}
-                    </span> */}
+                      {record.companyCrawledAt ? "完了" : "未処理"}
+                    </span>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm">
                     {/* <span
