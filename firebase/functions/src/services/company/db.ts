@@ -1,37 +1,63 @@
-import {
-  DocumentData,
-  DocumentReference,
-  getFirestore,
-} from "firebase-admin/firestore";
-import { Company } from "../../types";
+import { getFirestore } from "firebase-admin/firestore";
+
+export interface CompanyInfo {
+  name: string;
+  domain: string;
+  overview: string;
+  employeeCount?: string;
+  sales?: string;
+  businessActivities?: string[];
+  headOfficeAddress?: string;
+  capital?: string;
+  established?: string;
+}
 
 export async function saveCompany(
-  company: Company,
-  businessCardRef: DocumentReference<DocumentData, DocumentReference>
+  userId: string,
+  cardId: string,
+  company: CompanyInfo
 ) {
   const firestore = getFirestore();
-  const companiesRef = firestore.collection("companies");
+  const companyRef = firestore
+    .collection(`users/${userId}/cards/${cardId}/company`)
+    .doc();
 
-  const querySnapshot = await companiesRef
-    .where("domain", "==", company.domain)
-    .get();
-  const now = new Date();
-  if (querySnapshot.empty) {
-    // No record exists for the domain, create a new one
-    const companyRef = await companiesRef.doc(company.domain).set({
-      ...company,
-      createdAt: now,
-      updatedAt: now,
-      businessCardRefs: businessCardRef,
-    });
-    return companyRef;
-  } else {
-    // Record exists, update the first matching document (upsert behavior)
-    const companyDoc = querySnapshot.docs[0];
-    await companyDoc.ref.update({
-      ...company,
-      updatedAt: now,
-    });
-    return companyDoc.ref;
+  await companyRef.set({
+    ...company,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  return companyRef;
+}
+
+export async function getCompanyInfo(userId: string, cardId: string) {
+  const firestore = getFirestore();
+  const companyRef = firestore
+    .collection(`users/${userId}/cards/${cardId}/company`)
+    .doc();
+
+  const doc = await companyRef.get();
+  if (!doc.exists) {
+    return null;
   }
+
+  return doc.data() as CompanyInfo;
+}
+
+export async function updateCompanyInfo(
+  userId: string,
+  cardId: string,
+  companyId: string,
+  updates: Partial<CompanyInfo>
+) {
+  const firestore = getFirestore();
+  const companyRef = firestore.doc(
+    `users/${userId}/cards/${cardId}/company/${companyId}`
+  );
+
+  await companyRef.update({
+    ...updates,
+    updatedAt: new Date(),
+  });
 }

@@ -103,6 +103,7 @@ export function useCompaniesHooks() {
   const [companies, setCompanies] = useState<Company[]>([]);
 
   useEffect(() => {
+    const where = [];
     const companiesRef = collection(db, "companies");
     const unsubscribe = onSnapshot(
       companiesRef,

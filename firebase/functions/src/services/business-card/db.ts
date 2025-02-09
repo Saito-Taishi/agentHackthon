@@ -1,47 +1,48 @@
-import {
-  DocumentData,
-  FieldValue,
-  getFirestore,
-} from "firebase-admin/firestore";
+import { getFirestore } from "firebase-admin/firestore";
 import { CompanyScore } from "../company-scoring/score";
 
-const COLLECTION_NAME = "business_cards";
-export async function linkBusinessCard(
-  id: string,
-  companyRef: FirebaseFirestore.DocumentReference<DocumentData>
-): Promise<void> {
+export async function saveBusinessCard(
+  userId: string,
+  cardData: {
+    imageURL: string;
+    companyName: string;
+    personName: string;
+    personEmail?: string;
+    personPhoneNumber?: string;
+    role?: string;
+  }
+) {
   const firestore = getFirestore();
-  const businessCardRef = firestore.collection(COLLECTION_NAME).doc(id);
-  const businessCardSnap = await businessCardRef.get();
-  if (!businessCardSnap.exists) {
-    throw new Error(`名刺ドキュメント： ${id} は存在しません`);
-  }
+  const cardsRef = firestore.collection(`users/${userId}/cards`);
 
-  const companyQuerySnapshot = await companyRef.get();
-  if (!companyQuerySnapshot.exists) {
-    console.log(`企業ドキュメント： ${companyRef.id} は存在しません`);
+  const cardDoc = await cardsRef.add({
+    imageURL: cardData.imageURL,
+    companyName: cardData.companyName,
+    personName: cardData.personName,
+    personEmail: cardData.personEmail || null,
+    personPhoneNumber: cardData.personPhoneNumber || null,
+    role: cardData.role || null,
+    createdAt: new Date(),
+  });
 
-    // 名刺ドキュメントに companyRef フィールドを追加・更新
-    await businessCardRef.update({
-      companyRef: companyRef,
-      updatedAt: FieldValue.serverTimestamp(),
-    });
-  }
+  return cardDoc;
 }
 
 export async function updateScore(
-  id: string,
+  userId: string,
+  cardId: string,
   companyScore: CompanyScore
 ): Promise<void> {
   const firestore = getFirestore();
-  const businessCardRef = firestore.collection(COLLECTION_NAME).doc(id);
-  const businessCardSnap = await businessCardRef.get();
-  if (!businessCardSnap.exists) {
-    throw new Error(`名刺ドキュメント： ${id} は存在しません`);
+  const cardRef = firestore.doc(`users/${userId}/cards/${cardId}`);
+  const cardSnap = await cardRef.get();
+
+  if (!cardSnap.exists) {
+    throw new Error(`名刺ドキュメント： ${cardId} は存在しません`);
   }
 
-  await businessCardRef.update({
+  await cardRef.update({
     companyScore,
-    updatedAt: FieldValue.serverTimestamp(),
+    updatedAt: new Date(),
   });
 }

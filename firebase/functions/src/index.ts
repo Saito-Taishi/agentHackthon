@@ -42,10 +42,11 @@ export const createUserDocument = auth
 export const scrapeCompanyInfo = onDocumentCreated(
   {
     memory: "1GiB",
-    document: "business_cards/{id}",
+    document: "users/{userId}/cards/{cardId}",
   },
   async (event) => {
-    const businessCardID = event.params.id;
+    const userId = event.params.userId;
+    const cardId = event.params.cardId;
 
     const data = event.data;
     if (!data || !data.data().websiteURL) {
@@ -53,7 +54,6 @@ export const scrapeCompanyInfo = onDocumentCreated(
       return;
     }
     const businessCard = data.data();
-    const businessCardRef = data.ref;
 
     const crawlResult = await crawlCompanyInfo(businessCard.websiteURL);
     if (!crawlResult.success) {
@@ -61,11 +61,13 @@ export const scrapeCompanyInfo = onDocumentCreated(
       return;
     }
 
-    await saveCompany(crawlResult.company, businessCardRef);
+    // 企業情報を保存
+    await saveCompany(userId, cardId, crawlResult.company);
 
+    // スコアを計算して更新
     const role = businessCard.role;
     const employeeCount = crawlResult.company.employeeCount;
     const companyScore = await scoreCompany(role, employeeCount);
-    await updateScore(businessCardID, companyScore);
+    await updateScore(userId, cardId, companyScore);
   }
 );
