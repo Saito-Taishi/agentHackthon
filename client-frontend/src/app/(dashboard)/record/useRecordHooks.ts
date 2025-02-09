@@ -1,25 +1,24 @@
 import { auth, db } from "@/utils/config/firebase";
-import type { BusinessCardData } from "@/utils/db/business-card";
-import {
-  collection,
-  onSnapshot,
-  orderBy,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
-interface BusinessCard extends BusinessCardData {
-  id: string;
-  status: boolean;
-  imageUrl: string;
+interface BusinessCard {
+  imageURL: string;
+  websiteURL: string | null;
+  companyName: string | null;
+  companyAddress: string | null;
+  personName: string | null;
+  personEmail: string | null;
+  personPhoneNumber: string | null;
+  role: string | null;
+  createdAt: Date;
 }
 
 export type SelectedRecords = {
   id: string;
-  companyName: string|null;
-  personEmail: string|null;
-  personName: string|null;
+  companyName: string;
+  personEmail?: string;
+  personName: string;
 };
 
 export function useRecordHooks() {
@@ -31,25 +30,23 @@ export function useRecordHooks() {
   const [open, setOpen] = useState<boolean>(false); // EmailDrawerの表示ロジック
   const user = auth.currentUser;
 
+  console.log("records", records);
+
   useEffect(() => {
     if (!user) return;
 
-    const businessCardsRef = collection(db, "business_cards");
-    const q = query(
-      businessCardsRef,
-      where("createdBy", "==", user.uid),
-      orderBy("createdAt", "desc")
-    );
+    // users/{uid}/cards コレクションを参照
+    const cardsRef = collection(db, `users/${user.uid}/cards`);
+    const q = query(cardsRef, orderBy("createdAt", "desc"));
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
         const businessCards = snapshot.docs.map((doc) => {
-          const data = doc.data() as BusinessCardData;
+          const data = doc.data() as BusinessCard;
           return {
             ...data,
             id: doc.id,
-            imageUrl: "https://via.placeholder.com/150", // TODO: 実際の画像URLを設定
             status: false, // TODO: ステータスの管理方法を検討
           };
         });
@@ -81,7 +78,7 @@ export function useRecordHooks() {
         );
       }
 
-      // チェック: 新しいレコード情報を追加 (else ブロックを削除)
+      // チェック: 新しいレコード情報を追加
       return [
         ...prevSelectedRecords,
         {

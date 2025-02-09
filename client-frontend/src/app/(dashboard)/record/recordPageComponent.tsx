@@ -1,12 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useRecordHooks } from "./useRecordHooks";
 import { EmailDrawer } from "./emailDrawer";
+import { useRecordHooks } from "./useRecordHooks";
 
 export default function RecordPageComponent() {
-  const { records, handleCheckboxChange, selectedRecords, open, setOpen } =
-    useRecordHooks();
+  const { records, selectedRecords, open, setOpen } = useRecordHooks();
   const hasSelectedRecords = selectedRecords.length > 0; // 選択されたレコードがあるかどうか
 
   return (
@@ -111,23 +110,23 @@ export default function RecordPageComponent() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
-              {records.map((record) => (
-                <tr key={record.id} className="hover:bg-gray-50">
+              {records.map((record, idx) => (
+                <tr key={idx} className="hover:bg-gray-50">
                   <td className="whitespace-nowrap px-2 py-4 text-sm">
                     <input
                       type="checkbox"
                       className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
-                      value={record.id}
-                      checked={selectedRecords.some(
-                        (selectedRecord) => selectedRecord.id === record.id
-                      )}
-                      onChange={() => handleCheckboxChange(record.id, record)}
+                      // value={record.}
+                      // checked={selectedRecords.some(
+                      //   (selectedRecord) => selectedRecord.id === record.id
+                      // )}
+                      // onChange={() => handleCheckboxChange(record.id, record)}
                     />
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm">
                     <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
                       <Image
-                        src="/next.svg" // デフォルト画像パスを設定
+                        src={record.imageURL} // デフォルト画像パスを設定
                         alt="名刺画像"
                         width={48}
                         height={48}
@@ -163,7 +162,7 @@ export default function RecordPageComponent() {
                     {record.websiteURL}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm">
-                    <span
+                    {/* <span
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                         record.status
                           ? "bg-green-100 text-green-800"
@@ -171,7 +170,7 @@ export default function RecordPageComponent() {
                       }`}
                     >
                       {record.status ? "完了" : "未処理"}
-                    </span>
+                    </span> */}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm">
                     {/* <span
@@ -193,7 +192,7 @@ export default function RecordPageComponent() {
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     {record.createdAt
                       ? (() => {
-                          const date = record.createdAt.toDate();
+                          const date = new Date(record.createdAt);
                           const year = date.getFullYear();
                           const month = (date.getMonth() + 1)
                             .toString()
