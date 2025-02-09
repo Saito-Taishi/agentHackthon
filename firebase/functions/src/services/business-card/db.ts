@@ -1,31 +1,32 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { CompanyScore } from "../company-scoring/score";
+import { BusinessCard } from "./type";
 
 export async function saveBusinessCard(
   userId: string,
-  cardData: {
-    imageURL: string;
-    companyName: string;
-    personName: string;
-    personEmail?: string;
-    personPhoneNumber?: string;
-    role?: string;
-  }
+  cardData: Omit<BusinessCard, "createdAt">
 ) {
   const firestore = getFirestore();
   const cardsRef = firestore.collection(`users/${userId}/cards`);
 
-  const cardDoc = await cardsRef.add({
+  const card = {
     imageURL: cardData.imageURL,
     companyName: cardData.companyName,
     personName: cardData.personName,
     personEmail: cardData.personEmail || null,
+    companyAddress: cardData.companyAddress || null,
     personPhoneNumber: cardData.personPhoneNumber || null,
     role: cardData.role || null,
     createdAt: new Date(),
-  });
+    websiteURL: cardData.websiteURL || null,
+  } satisfies BusinessCard;
 
-  return cardDoc;
+  const cardDoc = await cardsRef.add(card);
+
+  return {
+    doc: cardDoc,
+    card: card,
+  };
 }
 
 export async function updateScore(
