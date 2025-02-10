@@ -31,8 +31,8 @@ export async function ocrBusinessCard(
   fileName: string
 ): Promise<OCRBusinessCardResponse> {
   const storage = getStorage();
-  const file = await storage.bucket().file(fileName).download();
-  const base64Image = file[0].toString("base64");
+  const [fileBuffer] = await storage.bucket().file(fileName).download();
+  const base64Image = fileBuffer.toString("base64");
   const imageMemeType = fileName.split(".").pop(); // corrected to use fileName
   if (!imageMemeType) throw new Error("Invalid image URL");
 
