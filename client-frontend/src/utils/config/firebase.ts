@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,3 +16,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const functions = getFunctions(app);
+
+interface EmailDraftRequest {
+  cardId: string;
+}
+
+interface EmailDraftResponse {
+  subject: string;
+  body: string;
+}
+
+// Cloud Functions
+export const generateEmailDraft = httpsCallable<
+  EmailDraftRequest,
+  EmailDraftResponse
+>(functions, "generateEmailDraft");
