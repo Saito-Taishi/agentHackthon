@@ -24,20 +24,23 @@
   - personPhoneNumber: string?（任意）
   - role: string?（任意）
 
-### company (サブコレクション)
+### companies (サブコレクション)
 
-- Collection: `users/{uid}/cards/{cardId}/company`
+- Collection: `users/{uid}/companies`
 - Document ID: 自動生成
 - Fields:
-- name: string（会社名）
-- domain: string（ドメイン名）
-- overview: string（会社概要）
-- employeeCount: string?（従業員数、任意）
-- sales: string?（売上高、任意）
-- businessActivities: string[]?（事業内容、任意）
-- headOfficeAddress: string?（本社所在地、任意）
-- capital: string?（資本金、任意）
-- established: string?（設立年月日、任意）
+  - name: string（会社名）
+  - domain: string（ドメイン名）
+  - overview: string（会社概要）
+  - employeeCount: string?（従業員数、任意）
+  - sales: string?（売上高、任意）
+  - businessActivities: string[]?（事業内容、任意）
+  - headOfficeAddress: string?（本社所在地、任意）
+  - capital: string?（資本金、任意）
+  - established: string?（設立年月日、任意）
+  - headOfficeAddress: string?（本社所在地、任意）
+  - capital: string?（資本金、任意）
+  - established: string?（設立年月日、任意）
 
 ## セキュリティルール
 
@@ -54,12 +57,12 @@ service cloud.firestore {
       match /cards/{cardId} {
         allow read: if request.auth != null && request.auth.uid == userId;
         allow write: if request.auth != null && request.auth.uid == userId;
+      }
 
-        // 企業情報サブコレクションのルール
-        match /companyInfo/{companyId} {
-          allow read: if request.auth != null && request.auth.uid == userId;
-          allow write: if request.auth != null && request.auth.uid == userId;
-        }
+      // 企業情報サブコレクションのルール
+      match /companies/{companyId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if request.auth != null && request.auth.uid == userId;
       }
     }
   }
