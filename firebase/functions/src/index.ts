@@ -58,7 +58,14 @@ export const handleFileUpload = onObjectFinalized(
       console.log(`OCR処理を開始します: ${event.data.name}`);
 
       // Cloud Storageの公開URLを生成
-      const imageURL = `https://storage.googleapis.com/${event.data.bucket}/${event.data.name}`;
+      const [imageURL] = await admin
+        .storage()
+        .bucket(event.data.bucket)
+        .file(event.data.name)
+        .getSignedUrl({
+          action: "read",
+          expires: "01-01-2034", // Set a far future expiration date
+        });
       console.log("画像のURLを生成しました:", imageURL);
 
       const ocrResponse = await ocrBusinessCard(event.data.name);
