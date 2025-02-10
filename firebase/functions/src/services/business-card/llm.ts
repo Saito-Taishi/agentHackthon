@@ -1,5 +1,6 @@
 import { getStorage } from "firebase-admin/storage";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+// import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { ChatVertexAI } from "@langchain/google-vertexai";
 import { ChatOpenAI } from "@langchain/openai";
 import { pull } from "langchain/hub";
 import { OCRBusinessCardResponse, isBusinessCard } from "./type";
@@ -36,7 +37,7 @@ export async function ocrBusinessCard(
   if (!imageMemeType) throw new Error("Invalid image URL");
 
   // AI処理
-  const llm = new ChatGoogleGenerativeAI({
+  const llm = new ChatVertexAI({
     model: "gemini-2.0-flash-exp",
     temperature: 0,
   });
