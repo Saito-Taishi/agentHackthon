@@ -3,6 +3,7 @@ import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
 interface BusinessCard {
+  id: string;
   imageURL: string;
   websiteURL: string | null;
   companyName: string | null;
@@ -32,6 +33,7 @@ export function useRecordHooks() {
   const user = auth.currentUser;
 
   console.log("records", records);
+  console.log("selectedRecords", selectedRecords);
 
   useEffect(() => {
     if (!user) return;
@@ -44,6 +46,7 @@ export function useRecordHooks() {
         const businessCards: BusinessCard[] = snapshot.docs.map((doc) => {
           const data = doc.data();
           return {
+            id: doc.id,
             imageURL: data.imageURL,
             websiteURL: data.websiteURL,
             companyName: data.companyName,
@@ -72,7 +75,7 @@ export function useRecordHooks() {
     return () => unsubscribe();
   }, [user]);
 
-  const handleCheckboxChange = (recordId: string, record: SelectedRecords) => {
+  const handleCheckboxChange = (recordId: string) => {
     setSelectedRecords((prevSelectedRecords) => {
       const alreadySelected = prevSelectedRecords.some(
         (selectedRecord) => selectedRecord.id === recordId
@@ -85,16 +88,13 @@ export function useRecordHooks() {
         );
       }
 
-      // チェック: 新しいレコード情報を追加
-      return [
-        ...prevSelectedRecords,
-        {
-          id: recordId,
-          companyName: record.companyName,
-          personName: record.personName,
-          personEmail: record.personEmail,
-        },
-      ];
+      const record = records.find((record) => record.id === recordId);
+      if (!record) {
+        console.error("Record not found:", recordId);
+        return prevSelectedRecords;
+      }
+
+      return prevSelectedRecords.concat(record);
     });
   };
 

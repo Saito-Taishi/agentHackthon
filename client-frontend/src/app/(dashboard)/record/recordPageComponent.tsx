@@ -5,7 +5,8 @@ import { EmailDrawer } from "./emailDrawer";
 import { useRecordHooks } from "./useRecordHooks";
 
 export default function RecordPageComponent() {
-  const { records, selectedRecords, open, setOpen } = useRecordHooks();
+  const { records, selectedRecords, open, setOpen, handleCheckboxChange } =
+    useRecordHooks();
   const hasSelectedRecords = selectedRecords.length > 0; // 選択されたレコードがあるかどうか
 
   return (
@@ -111,11 +112,11 @@ export default function RecordPageComponent() {
                     <input
                       type="checkbox"
                       className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
-                      // value={record.}
-                      // checked={selectedRecords.some(
-                      //   (selectedRecord) => selectedRecord.id === record.id
-                      // )}
-                      // onChange={() => handleCheckboxChange(record.id, record)}
+                      value={record.id}
+                      checked={selectedRecords.some(
+                        (selectedRecord) => selectedRecord.id === record.id
+                      )}
+                      onChange={() => handleCheckboxChange(record.id)}
                     />
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm">
