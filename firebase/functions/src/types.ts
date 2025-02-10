@@ -11,7 +11,6 @@ export interface ExtractedData {
 
 export interface Company {
   name: string;
-  domain: string;
   overview: string;
   employeeCount?: string;
   sales?: string;

@@ -17,13 +17,6 @@ export const crawlCompanyInfo = async (
   const analyzer = new CompanyAnalyzer();
 
   try {
-    const domain = analyzer.extractNormalizedDomain(url);
-    if (!domain) {
-      return {
-        success: false,
-        error: "URLからドメインを取得できませんでした",
-      };
-    }
     await scraper.initialize();
 
     // 最初のページからリンクを取得
@@ -48,7 +41,6 @@ export const crawlCompanyInfo = async (
 
     const company: Company = {
       ...companyInfo,
-      domain: domain,
     };
 
     return {

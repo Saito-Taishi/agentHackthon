@@ -2,7 +2,6 @@ import { getFirestore } from "firebase-admin/firestore";
 
 export interface CompanyInfo {
   name: string;
-  domain: string;
   overview: string;
   employeeCount?: string;
   sales?: string;
