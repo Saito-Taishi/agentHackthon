@@ -96,9 +96,7 @@ function isEmailDraftRequest(data: unknown): data is EmailDraftRequest {
   }
 
   const request = data as Record<string, unknown>;
-  return (
-    typeof request.userId === "string" && typeof request.cardId === "string"
-  );
+  return typeof request.cardId === "string";
 }
 
 /**
