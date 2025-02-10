@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@langchain/google-vertexai": "^0.1.8",
-    "@langchain/openai": "^0.4.3"
-  }
-}
