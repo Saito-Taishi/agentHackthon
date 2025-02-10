@@ -23,6 +23,7 @@ export const generateEmailDraft = onCall(
   },
   async (request): Promise<EmailDraftResponse> => {
     const firestore = getFirestore();
+    console.log("Email draft request:", request.data);
     // リクエストデータの型チェック
     if (!isEmailDraftRequest(request.data)) {
       throw new Error("不正なリクエスト形式です。");
@@ -63,7 +64,7 @@ export const generateEmailDraft = onCall(
         .limit(1)
         .get();
 
-      if (!companySnapshot.empty) {
+      if (companySnapshot.empty) {
         throw new Error("企業情報が見つかりません。");
       }
 
@@ -91,12 +92,11 @@ export const generateEmailDraft = onCall(
  * リクエストデータの型チェック
  */
 function isEmailDraftRequest(data: unknown): data is EmailDraftRequest {
-  if (typeof data !== "object" || data === null) {
-    return false;
+  if (typeof data === "object" && data !== null) {
+    const { cardId } = data as EmailDraftRequest;
+    return typeof cardId === "string";
   }
-
-  const request = data as Record<string, unknown>;
-  return typeof request.cardId === "string";
+  return false;
 }
 
 /**
