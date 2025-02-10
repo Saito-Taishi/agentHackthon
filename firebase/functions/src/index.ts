@@ -8,6 +8,7 @@ import { saveBusinessCard, updateScore } from "./services/business-card/db";
 import { ocrBusinessCard } from "./services/business-card/llm";
 import { scoreCompany } from "./services/company-scoring/score";
 import { saveCompany } from "./services/company/db";
+import { generateEmailDraft } from "./functions/email-draft";
 
 setGlobalOptions({
   region: "asia-northeast1",
@@ -101,3 +102,5 @@ export const handleFileUpload = onObjectFinalized(
     }
   }
 );
+
+export const generateEmailDrafts = generateEmailDraft;
