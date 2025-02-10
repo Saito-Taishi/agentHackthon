@@ -94,7 +94,12 @@ export function useRecordHooks() {
         return prevSelectedRecords;
       }
 
-      return prevSelectedRecords.concat(record);
+      return prevSelectedRecords.concat({
+        id: record.id,
+        companyName: record.companyName ?? "",
+        personName: record.personName ?? "",
+        personEmail: record.personEmail ?? undefined,
+      });
     });
   };
 
