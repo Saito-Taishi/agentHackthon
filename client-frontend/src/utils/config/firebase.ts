@@ -31,4 +31,4 @@ interface EmailDraftResponse {
 export const generateEmailDraft = httpsCallable<
   EmailDraftRequest,
   EmailDraftResponse
->(functions, "generateEmailDraft");
+>(getFunctions(app, "asia-northeast1"), "generateEmailDrafts", {});

@@ -60,7 +60,7 @@ export const EmailDrawer = ({
       });
 
       // Cloud Functionsからの応答を型安全に処理
-      const response = result.data as { subject: string; body: string };
+      const response = result.data;
       return response.body;
     } catch (error) {
       console.error("Failed to generate email content:", error);
