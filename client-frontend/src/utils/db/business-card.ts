@@ -3,7 +3,6 @@ import { Timestamp } from "firebase-admin/firestore";
 
 export type CompanyDetailData = {
   name: string;
-  domain: string;
   overview: string;
   employeeCount?: string;
   sales?: string;
