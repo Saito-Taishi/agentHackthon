@@ -30,7 +30,6 @@
 - Document ID: 自動生成
 - Fields:
   - name: string（会社名）
-  - domain: string（ドメイン名）
   - overview: string（会社概要）
   - employeeCount: string?（従業員数、任意）
   - sales: string?（売上高、任意）
